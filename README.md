@@ -1,1 +1,1 @@
-# peace-machine
+# Machine Learning for Peace
