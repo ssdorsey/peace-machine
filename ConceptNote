@@ -1,0 +1,74 @@
+\documentclass[11pt]{article}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{rotating}
+\usepackage{dcolumn}
+\usepackage{array}
+\usepackage{pgf,tikz}
+\usetikzlibrary{patterns,arrows,calc,positioning}
+\usepackage{graphics,graphicx}
+\usepackage{caption,subcaption}
+\usepackage{ctable}
+\usepackage{sectsty}
+\usepackage[english]{babel}
+%\usepackage[pdftex, breaklinks,colorlinks,linkcolor=black,citecolor=blue,urlcolor=black]{hyperref}
+\usepackage{amssymb,amsmath,amsfonts}
+\usepackage{enumitem}
+\usepackage{xcolor,colortbl}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{booktabs,fixltx2e}
+\usepackage[flushleft]{threeparttable}
+\usepackage{longtable}
+\usepackage{latexsym}
+\usepackage[margin=1in]{geometry}
+\usepackage{lscape}
+\setstretch{1.5}
+\setlength\parskip{0.05in}
+\usepackage{layouts}
+\usepackage{color}
+\usepackage{tabularx}
+\DeclareGraphicsExtensions{.pdf,.jpg,.png}
+\usepackage{geometry}
+\usepackage{appendix}
+\usepackage{xr-hyper}
+\usepackage{natbib}
+\bibpunct{(}{)}{,}{a}{}{;}
+%\let\footnotesize\normalsize
+\newtheorem{hypothesis}{Hypothesis}
+%\newcommand{\note}[1]{\footnote{\doublespacing #1}}
+%\usepackage[hidelinks]{hyperref}
+\usepackage{footmisc}
+\setlength{\footnotesep}{\baselineskip}
+%\renewcommand{\footnotelayout}{\doublespacing}level
+%\usepackage{draftwatermark}
+%\SetWatermarkText{Draft  - - not for citation or circulation}
+
+\title{Concept Note: Forecasting Democratic Backsliding with Event Data}
+\author{
+Serkant, Spencer, Mateo, Scott, Erik \\
+}
+
+\date{\today
+
+
+\begin{document}
+
+%%%%
+\setcounter{page}{1}
+\onehalfspacing
+
+Classes of actions:
+\begin{itemize}
+\item Violence/force:
+\item Freedom of association & free speech
+\item Institutions
+\item Distraction
+\end{itemize}
+
+\newpage
+\singlespacing
+\bibliographystyle{authordate1}
+\bibliography{}
+\end{document}
