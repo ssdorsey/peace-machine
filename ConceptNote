@@ -58,17 +58,26 @@ Serkant, Spencer, Mateo, Scott, Erik \\
 %%%%
 \setcounter{page}{1}
 \onehalfspacing
+Classes of actors:
+\begin{itemize}
+\item Chief executives
+\item Supreme courts
+\item Electoral commissions
+\item Police
+\item Major journalists
+\end{itemize}
+
 
 Classes of actions:
 \begin{itemize}
 \item Violence/force:
-\item Freedom of association & free speech
-\item Institutions
-\item Distraction
+\item Freedom of association & free speech:
+\item Institutions:
+\item Distraction:
 \end{itemize}
 
 \newpage
 \singlespacing
 \bibliographystyle{authordate1}
-\bibliography{}
+\bibliography{Backsliding_ref.bib}
 \end{document}
