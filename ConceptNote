@@ -58,6 +58,7 @@ Serkant, Spencer, Mateo, Scott, Erik \\
 %%%%
 \setcounter{page}{1}
 \onehalfspacing
+
 Classes of actors:
 \begin{itemize}
 \item Chief executives
@@ -65,46 +66,63 @@ Classes of actors:
 \item Local courts
 \item Electoral commissions
 \item Police
+\item Military
 \item Major journalists
 \item Media Institutions
-\item NGO
+\item NGOs
 \end{itemize}
 
 
 Classes of actions:
 \begin{itemize}
 \item Violence/force:
-
 \begin{itemize}
 \item Police violence against peaceful protestors
-\item Police violence against members of opposition parties during demonstrations
-\item Packing the military or the police forces
+\item Police violence against members of opposition parties/civil society during demonstrations
+\item Arrest/violence against journalists
+\item Declare martial law
 \end{itemize}
 
 \item Freedom of association & free speech:
 \begin{itemize}
 \item Using defamation cases to silence any critics
 \item Restrictive internet laws
+\item Shutting down social media/internet/websites
 \item Laws that restrict the right to assembly
 \item Incarceration of opposition members
+\item Changes to media ownership laws that limit competition or allow for consolidation
+\item Limit size of groups that can gather in public/tighten regulations on public demonstrations
 \end{itemize}
 
-\item Institutions:
+\item Institutions (EW: I don't understand how some of these are ``institutions''):
 \begin{itemize}
 \item Imposing broadcast bans on media institutions about issues government do not like them being spread
-\item Packing local courts 
+\item Packing local courts
 \item Packing higher courts such as Supreme Court, State Council, and High Council of Judges and Prosecutors
-\item Non-punishment of the executive's corrupt practices
+\item Packing the military or the police forces
+\item Non-punishment of the executive's corrupt practices (EW: ?)
 \item New laws regulating civil service
 \item New laws giving the executive nomination powers
+\item Erosion of the autonomy/authority of the electoral commission or electoral authorities.
+\item Purging members of the ruling party
+\item Extending or eliminating terms limits of chief executive
+\item Calling irregular elections or constitutional referenda
+\item Canceling regularly-scheduled elections
 \end{itemize}
 
 \item Distraction:
+\begin{itemize}
+\item{Declarations of strident nationalism, anti-foreign, anti-U.S., etc.}
+\item{Sudden emphasis on national security/sovereignty concerns}
+\item{Demonization of national/ethnic/religious miniorities}
+\item{Demonization of the opposition}
+\item{Anti-``elite'' language}
+\end{itemize}
 
+EW: these below seem too vague to be actionable
 \item Civil Society:
-\beging{itemize}
+\begin{itemize}
 \item Polarization of civil society
-\item Purges to members of the ruling party
 \end{itemize}
 \end{itemize}
 
