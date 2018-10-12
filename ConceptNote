@@ -59,7 +59,7 @@ Serkant, Spencer, Mateo, Scott, Erik \\
 \setcounter{page}{1}
 \onehalfspacing
 
-Classes of actors:
+\textbf{Classes of actors:}
 \begin{itemize}
 \item Chief executives
 \item Supreme courts
@@ -73,11 +73,11 @@ Classes of actors:
 \end{itemize}
 
 
-Classes of actions:
+\textbf{Classes of actions:}
 \begin{itemize}
 \item Violence/force:
 \begin{itemize}
-\item Police violence against peaceful protestors
+\item Police violence against peaceful protesters
 \item Police violence against members of opposition parties/civil society during demonstrations
 \item Arrest/violence against journalists
 \item Declare martial law
@@ -108,7 +108,7 @@ Classes of actions:
 \item Purging members of the ruling party
 \item Extending or eliminating terms limits of chief executive
 \item Calling irregular elections or constitutional referenda
-\item Canceling regularly-scheduled elections
+\item Cancelling regularly-scheduled elections
 \item Appointment of the President's family members in governmental institutions
 \item Changing rules for political competition (i.e. requirements for parties)
 \end{itemize}
@@ -117,7 +117,7 @@ Classes of actions:
 \begin{itemize}
 \item{Declarations of strident nationalism, anti-foreign, anti-U.S., etc.}
 \item{Sudden emphasis on national security/sovereignty concerns}
-\item{Demonization of national/ethnic/religious miniorities}
+\item{Demonization of national/ethnic/religious minorities}
 \item{Demonization of the opposition}
 \item{Anti-``elite'' language}
 \end{itemize}
