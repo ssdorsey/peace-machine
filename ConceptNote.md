@@ -1,18 +1,20 @@
 # Classes of Actors
 
-* Chief executives 
-* Supreme courts 
-* Local courts 
-* Electoral commissions 
-* Police 
-* Military 
-* Major journalists 
-* Media Institutions
-* NGOs
+1. Chief executives 
+1. Supreme courts 
+1. Local courts 
+1. Electoral commissions 
+1. Police 
+1. Military 
+1. (Major) journalists 
+1. Media Institutions
+1. NGOs
+1. Opposition politicans
+1. Political/social activists
 
 # Classes of actions: 
 
-* Violence/force:
+1. Violence/force:
 
   * Police violence against peaceful protesters 
   * Police violence against members of opposition parties/civil society during demonstrations 
@@ -20,7 +22,7 @@
   * Declare martial law 
   * Violent outbreaks during elections
   
-* Freedom of association & free speech: 
+2. Freedom of association & free speech: 
 
   * Using defamation cases to silence any critics 
   * Restrictive internet laws 
@@ -30,7 +32,7 @@
   * Changes to media ownership laws that limit competition or allow for consolidation 
   * Limit size of groups that can gather in public/tighten regulations on public demonstrations
   
-* Institutions (EW: I don’t understand how some of these are “institutions”): 
+3. Institutions: *EW: I don’t understand how some of these are “institutions”* 
 
   * Imposing broadcast bans on media institutions about issues government do not like them being spread
   * Packing local courts 
@@ -47,7 +49,7 @@
   * Appointment of the President’s family members in governmental institutions 
   * Changing rules for political competition (i.e. requirements for parties)
 
-* Distraction:
+4. Distraction:
 
   * Declarations of strident nationalism, anti-foreign, anti-U.S., etc. 
   * Sudden emphasis on national security/sovereignty concerns 
@@ -56,7 +58,7 @@
   * Anti-“elite” language
 
 
-* Others: *EW: these below seem too vague to be actionable*
+5. Others: *EW: these below seem too vague to be actionable*
 
   * Polarization of civil society 
   * Increase in demands to international organizations 
