@@ -26,7 +26,7 @@ had access. And, anything else that matters we’d get from event data.
 
     There’s also a ton of stories about journalists worth tracking. E.g.,
 
-    https://www.bbc.com/news/world-africa- 43558216
+    https://www.bbc.com/news/world-africa-43558216
 
 3. Social media leaders = harder. First, and most disturbing, Dorsey is RIGHT – facebook is where it’s at (http://gs.statcounter.com/social-media-stats/all/kenya):
 
