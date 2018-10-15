@@ -22,7 +22,7 @@ had access. And, anything else that matters we’d get from event data.
 
 2. Journalists
 
-    [http://www.mediacouncil.or.ke/en/mck/index.php/mck-accreditation/2015-list-of-accredited-](http://www.mediacouncil.or.ke/en/mck/index.php/mck-accreditation/2015-list-of-accredited-journalists)
+    [http://www.mediacouncil.or.ke/en/mck/index.php/mck-accreditation/2015-list-of-accredited-journalists](http://www.mediacouncil.or.ke/en/mck/index.php/mck-accreditation/2015-list-of-accredited-journalists)
 
     There’s also a ton of stories about journalists worth tracking. E.g.,
 
