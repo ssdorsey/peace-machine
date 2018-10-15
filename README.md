@@ -6,7 +6,8 @@
 
 ## Project management: https://github.com/ssdorsey/peace-machine/projects/1
 
-##Folders:
+## Folders:
+
 **data-pipeline**: folder for files in the event data and modeling pipeline
 
 **paper-files**: folder for references and drafting of papers
