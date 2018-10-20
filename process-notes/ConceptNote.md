@@ -1,12 +1,10 @@
 **Goal**: The goal of this project is to build a forecasting model of regime backsliding and the closure of civic spaces.  US AID and our partner organizations want the ability to plan responses to regime backsliding and minimally warn people on the ground about the potential for negative regime actions.  To be useful, this tool must deal with events at the weekly or monthly level – if it is less granular than this, it won’t be a useful forecasting tool.  One issue is that most of the theoretical work about regime backsliding is not dynamic in nature, nor does it deal with high frequency data.
+
 **Dependent variables**: We are most interested in three categories of behavior associated with civic spaces: the freedom of actors to associate, the freedom of speech, and the freedom from violence by the regime (either by imprisonment or physical harm).  We will thus run multiple forecasting models, each with a separate dependent variable (DV).  Challenges in measurement include attaining *high frequency data* on each of these categories (weekly or monthly) and dealing with the fact that different events have different magnitudes (e.g., jailing a group of journalists vs. turning off the internet for the entire country for a week).
+
 **Independent variables**: The core independent variables (IV’s) will be event data.  Event data used in the IR literature codes events as (subject, target, action).  For our purposes, we aim to broaden the set of actions to focus on intrastate conflict and the closure of civic spaces, but we also aim to develop addition variables that capture the sentiment and topics latent in newsfeeds.  In addition, we also hope to ingest the text of executive orders, legislation, and court cases that bear on our target variables.  One challenge is that given we will be relying on latent variables in many cases, how will we interpret these variables / produce marginal effects such that aid organizations can derive actionable information from the model?
+
 **Scope**: Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where US AID has interests.
-
-
-
-
-
 
 
 # Classes of Actors
