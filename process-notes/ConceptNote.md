@@ -44,7 +44,8 @@ An early list features we hope to use in the models
 * Topics and sentiments of local media stories
 * Topics and sentiments of relevant international media stories
 * Topics and sentiments of social media posts
-* Recent changes in institutional protection for civic spaces
+* Strength of institutional protection for civic spaces
+* Changes in institutional protection for civic spaces
 * Economic shocks
 * Increase in speech targeting minority groups
 * Increase in corruption cases reported in media
