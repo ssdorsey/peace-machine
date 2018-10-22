@@ -11,7 +11,7 @@ While the behaviors we are trying to predict are thematically linked, the condit
 Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where US AID has interests.
 
 ## Responses
-Below we list the specific civic closures that we will model along with 
+Below we list the specific civic closures that we will model
 
 ### Freedom of speech
 * Internet shutdowns
@@ -39,6 +39,8 @@ Below we list the specific civic closures that we will model along with
 
 
 ## Possible features
+An early list features we hope to use in the models
+
 * Topics and sentiments of local media stories
 * Topics and sentiments of relevant international media stories
 * Topics and sentiments of social media posts
