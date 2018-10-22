@@ -50,5 +50,6 @@ An early list features we hope to use in the models
 * Increase in speech targeting minority groups
 * Increase in corruption cases reported in media
 * Increase in protests
+
 ...
 
