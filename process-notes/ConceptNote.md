@@ -1,71 +1,53 @@
-**Goal**: The goal of this project is to build a forecasting model of regime backsliding and the closure of civic spaces.  US AID and our partner organizations want the ability to plan responses to regime backsliding and minimally warn people on the ground about the potential for negative regime actions.  To be useful, this tool must deal with events at the weekly or monthly level – if it is less granular than this, it won’t be a useful forecasting tool.  One issue is that most of the theoretical work about regime backsliding is not dynamic in nature, nor does it deal with high frequency data.
+# Machine Learning for Peace
 
-**Dependent variables**: We are most interested in three categories of behavior associated with civic spaces: the freedom of actors to associate, the freedom of speech, and the freedom from violence by the regime (either by imprisonment or physical harm).  We will thus run multiple forecasting models, each with a separate dependent variable (DV).  Challenges in measurement include attaining *high frequency data* on each of these categories (weekly or monthly) and dealing with the fact that different events have different magnitudes (e.g., jailing a group of journalists vs. turning off the internet for the entire country for a week).
+## Overview 
 
-**Independent variables**: The core independent variables (IV’s) will be event data.  Event data used in the IR literature codes events as (subject, target, action).  For our purposes, we aim to broaden the set of actions to focus on intrastate conflict and the closure of civic spaces, but we also aim to develop addition variables that capture the sentiment and topics latent in newsfeeds.  In addition, we also hope to ingest the text of executive orders, legislation, and court cases that bear on our target variables.  One challenge is that given we will be relying on latent variables in many cases, how will we interpret these variables / produce marginal effects such that aid organizations can derive actionable information from the model?
+The goal of this project is to build a forecasting model of civic-space closures. Roughly defined, a closure of a civic space occurs whenever a government significantly and negatively impacts its citizens' freedom of speech or freedom of association. US AID and our partner organizations want the ability to plan responses to these closures and minimally warn people on the ground about their potential. To be useful, this tool must deal with events at the weekly or monthly level – if it is less granular than this, it won’t be a useful forecasting tool. One issue is that most of the theoretical work in this area is not dynamic, nor does it deal with high-frequency data.
 
-**Scope**: Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where US AID has interests.
+To build models that can keep up with rapidly-changing events, we will rely on a mix of algorithmically-generated data from traditional media sources, social media, and NGO reports. Using this approach, we will create a historical dataset of civic-space closures to train on our models on and a near-real-time pipeline for processing new data and producing predictions. 
+
+While the behaviors we are trying to predict are thematically linked, the conditions that would lead a potentially-oppressive regime to--for example--shutdown the Internet are separate enough from the conditions that would cause them to ban an opposition political party that we will be required to build bespoke models for each. While we agnostic about specific methodological approaches, we will aim to maximize predictive capacity while maintaining a minimum standard of interpretability that will allow us to make recommendations about possible interventions. 
+
+Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where US AID has interests.
+
+## Responses
+Below we list the specific civic closures that we will model
+
+### Freedom of speech
+* Internet shutdowns
+* Blocking websites that would not be banned in a free society (i.e. blocking Instagram)
+
+* Arrest/violence against journalists
+* Closure/limiting distribution of media organization
+
+* Charging individuals with blasphemy 
+* Passing new laws that ban the criticism of government or religion 
 
 
-# Classes of Actors
+### Mix
+* Police violence against peaceful protesters 
 
-1. Chief executives
-1. Supreme courts
-1. Local courts
-1. Electoral commissions
-1. Police
-1. Military
-1. (Major) journalists
-1. Media institutions
-1. NGOs
-1. Opposition politicans
-1. Political/social activists
+* Declare martial law
 
-# Classes of actions:
 
-**1. Violence/force:**   
-  * Police violence against peaceful protesters
-  * Police violence against members of opposition parties/civil society during demonstrations
-  * Arrest/violence against journalists
-  * Declare martial law
-  * Violent outbreaks during elections
+### Freedom of association
+* Incarceration or assassination of political opposition
+* Banning political opposition party(ies) or barring specific opposition members from seeking office
+* Damage electoral integrity
 
-**2. Freedom of association & free speech:**    
-  * Using defamation cases to silence any critics
-  * Restrictive internet laws
-  * Shutting down social media/internet/websites
-  * Laws that restrict the right to assembly
-  * Incarceration of opposition members
-  * Changes to media ownership laws that limit competition or allow for consolidation
-  * Limit size of groups that can gather in public/tighten regulations on public demonstrations
-  * Imposing broadcast bans on media institutions about issues government do not like them being spread
-  * Restricting party formation/competition
+* Limit size of groups that can gather in public
 
-**3. Institutions:**    *EW: I don’t understand how some of these are “institutions”*
-  * Packing local courts
-  * Packing higher courts such as Supreme Court, State Council, and High Council of Judges and Prosecutors
-  * Packing the military or the police forces
-  * New laws regulating civil service
-  * New laws giving the executive nomination powers
-  * Erosion of the autonomy/authority of the electoral commission or electoral authorities.
-  * Purging members of the ruling party
-  * Extending or eliminating terms limits of chief executive
-  * Calling irregular elections or constitutional referenda
-  * Rescheduling/Postponing/Cancelling regularly-scheduled elections
-  * Appointment of the President’s family members in governmental institutions
-  * Changing rules for political competition (i.e. requirements for parties)
-  * Increased reliance on executive orders
 
-**4. Internal/External Threats:**   
-  * Declarations of strident nationalism, anti-foreign, anti-U.S., etc.
-  * Sudden emphasis on national security/sovereignty concerns
-  * Demonization of national/ethnic/religious minorities
-  * Demonization of the opposition
-  * Anti-“elite” language
+## Possible features
+An early list features we hope to use in the models
 
-**5. Others:**    *EW: these below seem too vague to be actionable*
-  * Polarization of civil society
-  * Increase in demands to international organizations
-  * Not allowing International organizations to monitor elections
-  * Increased number of corruption cases in the media
-  * Non-punishment of the executive’s corrupt practices (EW: ?)
+* Topics and sentiments of local media stories
+* Topics and sentiments of relevant international media stories
+* Topics and sentiments of social media posts
+* Recent changes in institutional protection for civic spaces
+* Economic shocks
+* Increase in speech targeting minority groups
+* Increase in corruption cases reported in media
+* Increase in protests
+...
+
