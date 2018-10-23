@@ -12,51 +12,68 @@ To build models that can keep up with rapidly-changing events, we will rely on a
 
 **Scope**: Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where USAID has interests.
 
-## Responses
+## Targets
 After our first approximation to the literature related to the closure of civic space as well as a detailed analysis of certain cases, we identified a series of specific events that could be used to model our dependent variables. Previously, most of the literature focused on rare events that affect the legal-framework of a country -- for instance, packing high courts or extending/eliminating term limits on the chief executive. However, we consider those as independent variables that would lead to changes in the frequencies of the events we are trying to model. A first list of events we will model is as follows:
 
-### Freedom of speech
-* Internet shutdowns
-* Blocking websites that would not be banned in a free society (i.e. blocking Instagram or YouTube)
-* Closure/limiting distribution of media organization or coverage
-* Discriminating against opposition media organizations in state ads, in press conferences etc.
-* Imposing broadcast bans on issues that government sees as sensitive
-
-* Arrest/violence against journalists
-
-* Charging individuals with blasphemy
-
-* Passing laws that ban criticism of government or religion
-
-
-### Mix
-* Police violence against peaceful protesters / ordinary citizens
-
-* Declaring martial law
-
-
-### Freedom of association
-* Incarceration or assassination of political opposition
-* Banning political opposition party(ies) or barring specific opposition members from seeking office
-* Damage electoral integrity
-
-* Limit size of groups that can gather in public
-
-* Laws that bring de facto obstacles to gathering (e.g., designing special meeting places and banning any other meeting outside these places)
-* Banning associations amongst civil society's groups or between them and international actors
-* Expulsion of NGOs working on the country
-
-## Possible features
-An early list features we hope to use in the models
-
-* Topics and sentiments of local media stories
-* Topics and sentiments of relevant international media stories
-* Topics and sentiments of social media posts
-* Strength of institutional protection for civic spaces
-* Changes in institutional protection for civic spaces
-* Economic shocks
-* Increase in speech targeting minority groups
-* Increase in corruption cases reported in media
-* Increase in protests
-
-...
+# Classes of Actors
+ 
+ 1. Chief executives
+ 1. Supreme courts
+ 1. Local courts
+ 1. Electoral commissions
+ 1. Police
+ 1. Military
+ 1. (Major) journalists
+ 1. Media institutions
+ 1. NGOs
+ 1. Opposition politicans
+ 1. Political/social activists
+ 
+ # Classes of actions:
+ 
+ **1. Violence/force:**   
+   * Police violence against peaceful protesters
+   * Police violence against members of opposition parties/civil society during demonstrations
+   * Arrest/violence against journalists
+   * Declare martial law
+   * Violent outbreaks during elections
+ 
+ **2. Freedom of association & free speech:**    
+   * Using defamation cases to silence any critics
+   * Restrictive internet laws
+   * Shutting down social media/internet/websites
+   * Laws that restrict the right to assembly
+   * Incarceration of opposition members
+   * Changes to media ownership laws that limit competition or allow for consolidation
+   * Limit size of groups that can gather in public/tighten regulations on public demonstrations
+   * Imposing broadcast bans on media institutions about issues government do not like them being spread
+   * Restricting party formation/competition
+ 
+ **3. Institutions:**    *EW: I don’t understand how some of these are “institutions”*
+   * Packing local courts
+   * Packing higher courts such as Supreme Court, State Council, and High Council of Judges and Prosecutors
+   * Packing the military or the police forces
+   * New laws regulating civil service
+   * New laws giving the executive nomination powers
+   * Erosion of the autonomy/authority of the electoral commission or electoral authorities.
+   * Purging members of the ruling party
+   * Extending or eliminating terms limits of chief executive
+   * Calling irregular elections or constitutional referenda
+   * Rescheduling/Postponing/Cancelling regularly-scheduled elections
+   * Appointment of the President’s family members in governmental institutions
+   * Changing rules for political competition (i.e. requirements for parties)
+   * Increased reliance on executive orders
+ 
+ **4. Internal/External Threats:**   
+   * Declarations of strident nationalism, anti-foreign, anti-U.S., etc.
+   * Sudden emphasis on national security/sovereignty concerns
+   * Demonization of national/ethnic/religious minorities
+   * Demonization of the opposition
+   * Anti-“elite” language
+ 
+ **5. Others:**    *EW: these below seem too vague to be actionable*
+   * Polarization of civil society
+   * Increase in demands to international organizations
+   * Not allowing International organizations to monitor elections
+   * Increased number of corruption cases in the media
+* Non-punishment of the executive’s corrupt practices (EW: ?)
