@@ -2,7 +2,7 @@
 title: "The Best Practice for finding events"
 author: "Serkant Adiguzel"
 date: "23 Ekim 2018"
-output: pdf_document
+output: md_document
 ---
 I present the results of my attempts to find the events related to closure of civic spaces in Turkey. I realized that using some keywords can be useful especially for high-frequency events as I show below.
 
