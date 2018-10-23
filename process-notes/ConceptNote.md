@@ -21,6 +21,8 @@ Below we list the specific civic closures that we will model
 
 * Arrest/violence against journalists
 * Closure/limiting distribution of media organization
+* Serkant: Discriminating against opposition media organizations in state ads, in press conferences etc.
+* Serkant: Imposing broadcast bans on various issues that government sees as sensitive
 
 * Charging individuals with blasphemy 
 * Passing new laws that ban the criticism of government or religion 
@@ -39,6 +41,7 @@ Below we list the specific civic closures that we will model
 
 * Limit size of groups that can gather in public
 
+*Serkant: Laws that bring de facto obstacles to gathering (e.g., designing special meeting places and banning any other meeting outside these places)
 
 ## Possible features
 An early list features we hope to use in the models
