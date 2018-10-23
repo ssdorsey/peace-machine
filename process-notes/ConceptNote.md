@@ -14,20 +14,6 @@ To build models that can keep up with rapidly-changing events, we will rely on a
 
 ## Targets
 After our first approximation to the literature related to the closure of civic space as well as a detailed analysis of certain cases, we identified a series of specific events that could be used to model our dependent variables. Previously, most of the literature focused on rare events that affect the legal-framework of a country -- for instance, packing high courts or extending/eliminating term limits on the chief executive. However, we consider those as independent variables that would lead to changes in the frequencies of the events we are trying to model. A first list of events we will model is as follows:
-
-### Classes of Actors
- 
- 1. Chief executives
- 1. Supreme courts
- 1. Local courts
- 1. Electoral commissions
- 1. Police
- 1. Military
- 1. (Major) journalists
- 1. Media institutions
- 1. NGOs
- 1. Opposition politicans
- 1. Political/social activists
  
  ### Classes of actions:
  
@@ -49,7 +35,9 @@ After our first approximation to the literature related to the closure of civic 
    * Imposing broadcast bans on media institutions about issues government do not like them being spread
    * Restricting party formation/competition
  
- **3. Institutions:**    *EW: I don’t understand how some of these are “institutions”*
+ ### Indepdendent variables 
+ 
+ **1. Institutional warning signs:**    
    * Packing local courts
    * Packing higher courts such as Supreme Court, State Council, and High Council of Judges and Prosecutors
    * Packing the military or the police forces
@@ -76,4 +64,19 @@ After our first approximation to the literature related to the closure of civic 
    * Increase in demands to international organizations
    * Not allowing International organizations to monitor elections
    * Increased number of corruption cases in the media
-* Non-punishment of the executive’s corrupt practices (EW: ?)
+   * Non-punishment of the executive’s corrupt practices (EW: ?)
+
+
+### Classes of Actors
+ 
+ 1. Chief executives
+ 1. Supreme courts
+ 1. Local courts
+ 1. Electoral commissions
+ 1. Police
+ 1. Military
+ 1. (Major) journalists
+ 1. Media institutions
+ 1. NGOs
+ 1. Opposition politicans
+ 1. Political/social activists
