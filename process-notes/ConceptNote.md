@@ -41,7 +41,7 @@ Below we list the specific civic closures that we will model
 
 * Limit size of groups that can gather in public
 
-*Serkant: Laws that bring de facto obstacles to gathering (e.g., designing special meeting places and banning any other meeting outside these places)
+* Serkant: Laws that bring de facto obstacles to gathering (e.g., designing special meeting places and banning any other meeting outside these places)
 
 ## Possible features
 An early list features we hope to use in the models
