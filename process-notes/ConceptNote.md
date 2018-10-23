@@ -13,7 +13,7 @@ To build models that can keep up with rapidly-changing events, we will rely on a
 **Scope**: Initially, we will start with *Armenia, Kenya, Ukraine, Venezuela*.  Humans in the loop will gather information on the actors, actions, etc. (see below) for each case and will help us calibrate the models that will autonomously generate these data.  We will, however, broaden to the entire set of nations where US AID has interests.
 
 ## Responses
-After our first approximation to the literature related to the closure of civic space as well as a detailed analysis of certain cases, we identified a series of specific events that could be used to model our dependent variable. As expsoed previously, most of the literature focus on non-frequent events that affect the legal-framework of a country. However, we consider those as independent variables that would lead to changes in the frequencies of the events we are trying to model. The list is as follows:
+After our first approximation to the literature related to the closure of civic space as well as a detailed analysis of certain cases, we identified a series of specific events that could be used to model our dependent variable. As exposed previously, most of the literature focus on non-frequent events that affect the legal-framework of a country. However, we consider those as independent variables that would lead to changes in the frequencies of the events we are trying to model. A first list of events we will model is as follows:
 
 ### Freedom of speech
 * Internet shutdowns
