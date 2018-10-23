@@ -15,7 +15,7 @@ To build models that can keep up with rapidly-changing events, we will rely on a
 ## Targets
 After our first approximation to the literature related to the closure of civic space as well as a detailed analysis of certain cases, we identified a series of specific events that could be used to model our dependent variables. Previously, most of the literature focused on rare events that affect the legal-framework of a country -- for instance, packing high courts or extending/eliminating term limits on the chief executive. However, we consider those as independent variables that would lead to changes in the frequencies of the events we are trying to model. A first list of events we will model is as follows:
 
-# Classes of Actors
+### Classes of Actors
  
  1. Chief executives
  1. Supreme courts
@@ -29,7 +29,7 @@ After our first approximation to the literature related to the closure of civic 
  1. Opposition politicans
  1. Political/social activists
  
- # Classes of actions:
+ ### Classes of actions:
  
  **1. Violence/force:**   
    * Police violence against peaceful protesters
