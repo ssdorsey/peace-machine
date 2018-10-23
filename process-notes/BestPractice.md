@@ -2,7 +2,7 @@ I present the results of my attempts to find the events related to
 closure of civic spaces in Turkey. I realized that using some keywords
 can be useful especially for high-frequency events as I show below.
 
-##Trying keywords for high-frequency events
+## Trying keywords for high-frequency events
 
 Internment of peaceful protestors is one of the high-frequency events
 that we can easily come across on a weekly (or even daily ) basis in
@@ -22,7 +22,7 @@ one news was a summary of all defamation cases which aim to punish
 people on the grounds of insulting the president (other 2 news were
 about main opposition party opening new cases against Erdogan).
 
-##Trying keywords for laws that restrict civic space (low-frequency)
+## Trying keywords for laws that restrict civic space (low-frequency)
 
 In this case, I could not find the relevant news. I think this stems
 from the fact that each so-called reform changes some specific law.
