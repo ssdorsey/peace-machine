@@ -2,8 +2,15 @@ The purpose of the present document is to provide a guide for the manual coding 
 
 ## 1. Know your country
 If this is the first time you conduct research on the country assigned to you, make sure you do some backroung reading first. This way, you can be able to identify certain of the most prominent features of the country, particularly in the last 10 years. You should be able to answer questions like:
-* W
+* Who is the current president? What is his or her party? Since when he/she has been in power?
+* What is the organization of the state? 
+* What is the role of the military in the state? The police's role?
+* What are the most prominent media outlets?
+** How did the current party obtained the presidency?
+Answering this types of questions will allow you to start identifying the main actors invovled in your case study. It could be helpful during this first approximation to write in a piece of paper the most prominent events of the country. So you can make a timeline of the events in the period you are analyzing. 
 
+## 2. Choose a news outlet
+After you feel comfortable with your overall knowledge of the country and the identification of the actors, it is important to choose a news outlet to start the coding process. There are two
 ## Trying keywords for high-frequency events
 
 Internment of peaceful protestors is one of the high-frequency events
