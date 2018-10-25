@@ -1,6 +1,8 @@
-I present the results of my attempts to find the events related to
-closure of civic spaces in Turkey. I realized that using some keywords
-can be useful especially for high-frequency events as I show below.
+The purpose of the present document is to provide a guide for the manual coding exercise. Here, we assume that individuals will be searching for the news themselves instead of the mechanism we proposed last week where we give them the news. 
+
+## 1. Know your country
+If this is the first time you conduct research on the country assigned to you, make sure you do some backroung reading first. This way, you can be able to identify certain of the most prominent features of the country, particularly in the last 10 years. You should be able to answer questions like:
+* W
 
 ## Trying keywords for high-frequency events
 
