@@ -1,0 +1,226 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{natbib}
+\usepackage{csquotes}
+\usepackage{placeins}
+\usepackage[margin=1in]{geometry}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{booktabs} 
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage[bottom]{footmisc}
+\doublespacing
+\title {VDem Indices Analysis}
+
+\begin{document}
+\maketitle
+
+
+\section{Major Indices Created Using VDem data}
+
+I restricted the analysis to post 1980 period for three reasons. First, this ensures that we will not have many missing data. Second, I believe that data quality should be better for this period as VDem relies on experts' knowledge and they are not historian most of the time. Lastly, democratic backsliding is a recent phenomenon that became an issue after 1990s. VDem data has hierarchial structure, meaning that most of the indices consist of other sub-indices. I firstly focus on the major indices. Then, I will switch to sub-indices (which consist of some variables directly coded by the experts) and some variables that compose these major indices. The following indices seem relevant for our purposes and the questions they try to answer are as follows:\footnote{These are directly taken from VDem codebook.}
+
+\noindent \textbf{Electoral component index}: To what extent is the electoral principle of democracy achieved? (\verb`v2x_EDcomp_thick`) \\
+\textbf{Corruption index}: (\verb`v2x_corr`) \\
+\textbf{Freedom of expression index} and \textbf{Alternative sources of information index}: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression? (\verb`v2x_freexp` and \verb`v2xme_altinf`) \\
+\textbf{Civil liberties index}: To what extent is civil liberty respected? (\verb`v2x_civlib`) \\
+\textbf{Accountability index}: To what extent is the ideal of government accountability achieved? (\verb`v2x_accountability`) \\
+\textbf{Party institutionalization index}: To what extent are political parties institutionalized? Party institutionalization refers to various attributes of the political parties in a country, e.g., level and depth of organization, links to civil society, cadres of party activists, party supporters within the electorate, coherence of party platforms and ideologies, party-line voting among representatives within the legislature. A high score on these attributes generally indicates a more institutionalized party system. (\verb`v2xps_party`) \\
+\textbf{Core civil society index}: How robust is civil society? The sphere of civil society lies in the public space between the private sphere and the state. Here, citizens organize in groups to pursue their collective interests and ideals. We call these groups civil society organizations CSOs. CSOs include, but are by no means limited to, interest groups, labor unions, spiritual organizations if they are engaged in civic or political activities, social movements, professional associations, charities, and other non-governmental organizations. The core civil society index CCSI is designed to provide a measure of a robust civil society, understood as one that enjoys autonomy from the state and in which citizens freely and actively pursue their political and civic goals, however conceived. (\verb`v2xcs_ccsi`) \\
+\textbf{Division of power index}: Are there elected local and regional governments, and if so to what extent can they operate without interference from unelected bodies at the local level? (\verb`v2x_feduni`) \\
+\textbf{Rule of law index}: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law? (\verb`v2x_rule`)
+
+
+<<echo=FALSE, warning=FALSE, message=FALSE>>=
+rm(list=ls())
+library(dplyr)
+library(magrittr)
+library(readstata13)
+library(ggplot2)
+
+
+#vdem <- read.dta13("V-Dem-CY+Others-v8.dta")
+#major <- vdem %>% dplyr::select(country_name, country_text_id, country_id, COWcode, year, v2x_corr, v2x_EDcomp_thick, v2x_freexp, v2x_civlib, v2x_accountability, v2xps_party, v2xcs_ccsi, v2xme_altinf, v2x_feduni, v2x_rule, v2x_frassoc_thick, v2xel_frefair, v2x_elecoff, v2x_pubcorr, v2x_execorr, v2mecenefm, v2meharjrn, v2meslfcen, v2cldiscm, v2cldiscw, v2clacfree, v2x_clpriv, v2x_clphy, v2x_clpol, v2x_veracc, v2x_horacc, v2x_diagacc, v2psorgs, v2psprbrch, v2psprlnks, v2psplats, v2pscohesv, v2csprtcpt, v2cseeorgs, v2csreprss, v2mebias, v2mecrit, v2merange, v2ellocgov, v2elreggov, v2ellocelc, v2elsrgel, v2ellocpwr, v2elrgpwr, v2juhccomp, v2jucomp, v2juhcind, v2juncind, v2exrescon, v2clrspct, v2cltrnslw, v2clacjstm, v2clacjstw, v2juaccnt, v2jucorrdc, v2excrptps, v2exthftps, v2exbribe, v2exembez, v2lgcrrpt, v2jucorrdc)
+#major <- major %>% filter(year>1980)
+#write.csv(major, file="C://Users//hp-pc//Dropbox//some data//machine learning for peace data//indicesData.csv")
+
+vdem <- read.csv("indicesData.csv", stringsAsFactors = FALSE)
+
+major <- vdem %>% dplyr::select(country_name, country_text_id, country_id, COWcode, year, v2x_corr, v2x_EDcomp_thick, v2x_freexp, v2x_civlib, v2x_accountability, v2xps_party, v2xcs_ccsi, v2xme_altinf, v2x_feduni, v2x_rule)
+
+
+major <- major %>% filter(is.na(v2x_corr)==0)
+major <- major %>% filter(is.na(v2x_EDcomp_thick)==0)
+major <- major %>% filter(is.na(v2x_freexp)==0)
+major <- major %>% filter(is.na(v2x_civlib)==0)
+major <- major %>% filter(is.na(v2x_accountability)==0)
+major <- major %>% filter(is.na(v2xps_party)==0)
+major <- major %>% filter(is.na(v2xcs_ccsi)==0)
+major <- major %>% filter(is.na(v2xme_altinf)==0)
+major <- major %>% filter(is.na(v2x_rule)==0)
+major <- major %>% filter(is.na(v2x_feduni)==0)
+
+
+major_pca <- prcomp(major[, 6:15], center = TRUE,scale. = TRUE)
+@
+
+
+<<echo=FALSE, results="hide", warning=FALSE, message=FALSE>>=
+colnames(major)[6:15] <- c("Corruption", "Electoral component", "Freedom of expression", "Civil liberties", "Accountability", "Party institutionalization", "Core civil society", "Alternative sources of information", "Division of power", "Rule of law")
+stargazer::stargazer(major[, 6:15])
+@
+
+The descriptive statistics for these major indices is as follows:
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Paz, Kas 25, 2018 - 17:10:13
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lccccccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Corruption & 5,598 & 0.527 & 0.292 & 0.005 & 0.255 & 0.790 & 0.977 \\ 
+Electoral component & 5,598 & 0.558 & 0.269 & 0.003 & 0.316 & 0.830 & 0.950 \\ 
+Freedom of expression & 5,598 & 0.635 & 0.301 & 0.011 & 0.384 & 0.893 & 0.991 \\ 
+Civil liberties & 5,598 & 0.652 & 0.268 & 0.011 & 0.447 & 0.896 & 0.976 \\ 
+Accountability & 5,598 & 0.554 & 0.934 & $-$1.626 & $-$0.191 & 1.360 & 2.191 \\ 
+Party institutionalization & 5,598 & 0.593 & 0.262 & 0.003 & 0.409 & 0.822 & 1.000 \\ 
+Core civil society & 5,598 & 0.643 & 0.292 & 0.011 & 0.413 & 0.899 & 0.979 \\ 
+Alternative sources of information & 5,598 & 0.619 & 0.306 & 0.014 & 0.362 & 0.884 & 0.987 \\ 
+Division of power & 5,598 & 0.441 & 0.356 & 0 & 0.1 & 0.8 & 1 \\ 
+Rule of law & 5,598 & 0.535 & 0.306 & 0.018 & 0.263 & 0.825 & 0.998 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+All indices except for accountability index ranges from 0 to 1. Apparently, there was a problem with accountability index. Although, in the codebook it says that the index should be between 0 and 1, there are some negative values as seen in the desriptive statistics. I think that they did not rescale it since they put a cautionary note for this index. I paste this note here (from the codebook): 
+
+``While estimates of the latent variable Vertical Accountability $(v2x\_veracc)$ converged according to standard V-Dem criteria, some parameters involved in the estimation process for this variable did not. As a result, this variable should be used with caution. All other Accountability indices \textendash the overall Accountability index $(v2x_accountability)$, Diagonal Accountability index $(v2x\_diagacc)$, Vertical Accountability index $(v2x\_vertacc)$, and Horizontal Accountability index $(v2x\_horacc)$\textendash met V-Dem criteria for convergence."
+
+
+<<echo=FALSE, results="hide">>=
+cor_matrix <- cor(major[, 6:15])
+xtable::xtable(cor_matrix)
+
+@
+
+The correlation matrix for these 10 indices are as follows:
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Sun Nov 25 17:02:18 2018
+
+% latex table generated in R 3.5.1 by xtable 1.8-2 package
+% Sun Nov 25 17:12:15 2018
+\begin{table}[ht]
+\centering
+     \begin{adjustbox}{width=\textwidth,totalheight=\textheight,keepaspectratio}
+\begin{tabular}{rrrrrrrrrrr}
+  \hline
+ & Corruption & Electoral comp. & Freedom of exp. & Civil lib. & Accountability & Party inst. & Core CS & Alt. sources of inf. & Div. of power & Rule of law \\ 
+  \hline
+Corruption & 1.00 & -0.59 & -0.50 & -0.54 & -0.60 & -0.57 & -0.45 & -0.41 & -0.46 & -0.89 \\ 
+  Electoral comp. & -0.59 & 1.00 & 0.87 & 0.88 & 0.93 & 0.70 & 0.85 & 0.83 & 0.70 & 0.78 \\ 
+  Freedom of exp. & -0.50 & 0.87 & 1.00 & 0.95 & 0.95 & 0.56 & 0.94 & 0.93 & 0.68 & 0.75 \\ 
+  Civil lib. & -0.54 & 0.88 & 0.95 & 1.00 & 0.94 & 0.58 & 0.93 & 0.87 & 0.67 & 0.78 \\ 
+  Accountability & -0.60 & 0.93 & 0.95 & 0.94 & 1.00 & 0.64 & 0.93 & 0.93 & 0.71 & 0.83 \\ 
+  Party inst. & -0.57 & 0.70 & 0.56 & 0.58 & 0.64 & 1.00 & 0.53 & 0.52 & 0.55 & 0.62 \\ 
+  Core CS & -0.45 & 0.85 & 0.94 & 0.93 & 0.93 & 0.53 & 1.00 & 0.91 & 0.64 & 0.70 \\ 
+  Alt. sources of inf. & -0.41 & 0.83 & 0.93 & 0.87 & 0.93 & 0.52 & 0.91 & 1.00 & 0.63 & 0.66 \\ 
+  Div. of power & -0.46 & 0.70 & 0.68 & 0.67 & 0.71 & 0.55 & 0.64 & 0.63 & 1.00 & 0.59 \\ 
+  Rule of law & -0.89 & 0.78 & 0.75 & 0.78 & 0.83 & 0.62 & 0.70 & 0.66 & 0.59 & 1.00 \\ 
+   \hline
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+When we look at the correlation matrix, most of the variables are highly correlated. For instance, the correlation coefficient of our key index (Core CS index) are $0.85$, $0.94$, $0.93$, $0.93$, $0.91$ with electoral component, freedom of expression, civil liberties, accountability, and alternative sources of information indices respectively. The correlation is weaker for party institutionalization index ($0.53$), division of power index ($0.64$), and rule of law index ($0.70$) though they are also pretty high.
+
+To reduce dimension, I did the PCA and the results are as follows:
+
+<<>>=
+#Summary of the PCA using all major indices
+summary(major_pca)
+@
+
+The results show that PC1 explains the 76\% of the total variance. When we add PC2, they explain 86\% of the total variance. The screeplot for this PCA is as follows:
+
+
+<<results="asis">>=
+screeplot(major_pca)
+@
+When we look at the biplot, we see that corruption index contributes to the second component. The rest all contributes to the first component. 
+<<echo=FALSE, results="asis", warning=FALSE, message=FALSE, error=FALSE>>=
+#If you do not have the ggbiplot installed, you need to install it but it is not available on CRAN yet. It can be downloaded with the following commands:
+#library(devtools)
+#install_github("vqv/ggbiplot")
+
+library(ggbiplot)
+ggbiplot(major_pca)
+@
+
+
+\section{Sub-Components of Major Indices}
+Each major index above either composes of sub-indices or of variables directly coded by the experts. This means that sub-indices also compose of some variables which are coded by the experts. Major indices analyzed above consist of the following components:
+
+\textbf{Electoral component index}: Freedom of association index, Clean election index, Elected officials index.\footnote{Percent of population with suffrage is the fourth component of this index. But, I excluded this since there would be no variance at all for this variable as this will be 100\% for all observations.} \\
+
+\textbf{Corruption index}: Public sector corruption index, Executive corruption index, legislature corrupt activities, judicial corruption decision \\
+
+\textbf{Civil liberties index}: Private civil liberties index, physical violence index, political civil liberties index \\
+
+\textbf{Accountability index}: Vertical accountability index, horizontal accountability index, diagonal accountability index \\
+
+\textbf{Party institutionalization index}: Party organizations, party branches, party linkages, distinct party platforms, legislative party cohesion \\
+
+\textbf{Core civil society index}: CSO participatory environment, CSO entry and exit, CSO repression \\
+
+\textbf{Alternative sources of information index}: Media bias, Print/broadcast media critical, print/broadcast media perspective 
+
+\textbf{Division of power index}: Local government exists\footnote{There was no variation at all in this variable, so it was removed during the PCA}, regional government exists\footnote{There was no variation at all in this variable, so it was removed during the PCA}, local government elected, regional government elected, local offices relative power, regional offices relative power 
+
+\textbf{Rule of law index}: Compliance with the high court, compliance with judiciary, high court independence, lower court independence, executive respects constitution, rigorous and impartial public administration, transparent laws with predictable enforcement, access to justice for men, access to justice for women, judicial accountability, judicial corruption decision, public sector corrupt exchanges, public sector theft, executive bribery and corrupt exchanges, executive embezzlement and theft 
+
+Since there are many sub-indices and variables, I directly jump to PCA. When we do PCA using all sub-indices and variables that make up major indices analyzed in previous section, first component explains 64.4\% of total variation. The second component explains 9.9\% of total variation and they together explain 74.3\%. The results for all components can be seen below. 
+
+<<echo=FALSE, message=FALSE, warning=FALSE>>=
+minor <- vdem %>% dplyr::select(-v2x_corr, -v2x_EDcomp_thick, -v2x_freexp, -v2x_civlib, -v2x_accountability, -v2xps_party, -v2xcs_ccsi, -v2xme_altinf, -v2x_feduni, -v2x_rule)
+@
+
+
+
+<<echo=FALSE, message=FALSE, warning=FALSE, results="hide">>=
+minor <- na.omit(minor)
+minor <- minor %>% dplyr::select(-v2ellocgov, -v2elreggov)
+
+minor_pca <- prcomp(minor[, 7:54], center = TRUE,scale. = TRUE)
+
+minor_nocorruption <- minor %>% dplyr::select(-v2lgcrrpt, -v2jucorrdc, -v2x_pubcorr, -v2x_execorr)
+
+minor_nocorruption_pca <- prcomp(minor_nocorruption[, 7:50], center = TRUE,scale. = TRUE)
+summary(minor_nocorruption_pca)
+@
+
+<<>>=
+summary(minor_pca)
+@
+
+Since it was corruption index that contributed the second component in previous analysis, I repeated the analysis excluding sub-indices and variables that compose the corruption index. That is, I excluded public sector corruption index,executive corruption index, legislature corrupt activities, and judicial corruption decision. When we do it, the results do not change much. The first and second components explain 66\% and 7.8\% of total variation respectively. That is why, I continue the analysis by including the corruption indices as well. The screeplot for this PCA is as below. As expected, the biplot shows that it is corruption indices that contribute to PC2 mostly (see below).
+
+<<results="asis">>=
+screeplot(minor_pca)
+@
+
+
+<<results="asis">>=
+ggbiplot(minor_pca)
+
+@
+
+
+\end{document}
