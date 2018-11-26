@@ -2,6 +2,23 @@
 
 ## Media Sources
 
+### Local
+1. To start with we will scrape the top-5 most-popular news websites (according to Alexa) for each country 
+2. We will also build a comprehensive list of digitially-available local media for later download + machine coding 
+   * Wikipedia already has very good lists available
+
+### International
+
+
+## Initial filtering
+
+1. For each event type will build logical search phrases that will capture every possibly-relevant news story
+1. Restrict based on time for intial test (ex: 2015-2017)
+1. Event creation
+  1. Using the restricted corpus, hand-coders will create events using a platform like dataturks
+  1. Computer will do the same
+1. Evaluate
+
 ## Sample data
 
 ### JSON (native)
@@ -73,6 +90,8 @@
 
 
 ## Columns
+
+**We need to get more specific coding rules but let's check to see if we have everything we want here first**
 
 ### event_id
 Unique id number for each event. Useful events with multiple targets. One row for each named target, can easily collapse to single row via event_id
