@@ -8,7 +8,11 @@
    * Wikipedia already has very good lists available
 
 ### International
-
+1. BBC
+1. NYT
+1. AP
+1. AFP
+1. **Other major papers, wires, and specialty publications like Devex**
 
 ## Initial filtering
 
@@ -102,7 +106,9 @@ Unique id number for each event. Useful events with multiple targets. One row fo
 
 ### event_type
 
-  The "verb" in the event. Targets of interest under each
+  The "verb" in the event. Targets of interest under each. 
+  
+  **We will likely need more sub-categories under each of these**
   
 1. Non-lethal violence
    * protesters
