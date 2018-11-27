@@ -7,7 +7,7 @@ The present document outlines the main components of the coding procedure. It de
 1. To start with, we will scrape the top-5 most-popular news websites (according to Alexa) for each country. This way, we can "objectively" determine which ones are the most important papers in terms of views. Instead of relying on other algorithms like the one used by Google News.   
 2. We will also build a comprehensive list of digitially-available local media for later download + machine coding 
    * Wikipedia already has very good lists available
-   * The idea is to capture local media here that could give more reports on some of the activities we are interested. Our concern here is just that increasing the number of sources we can include a lot of noise into our data. 
+   * The idea is to capture local media here that could give more reports on some of the activities we are interested. Our concern is just that increasing the number of sources we can include a lot of noise into our data. 
 
 ### International
 1. BBC
