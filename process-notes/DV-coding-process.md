@@ -1,11 +1,13 @@
 # Rules for coding initial DV
+The present document outlines the main components of the coding procedure. It defines the way we are identifying the sources of information as well as the specifications of some of the information we want to capture from each source. Moving forward we are missing a detailed list of keywords for each one of our dependent variables that would be used to scrape the news in the future. This list will be in English but, will also contain translations in the local languages of our first 4 targeted countries. Finally, the idea is that after the initial test we are running, we will scrape the news from the media sources identified and give them to the new coders. This means, that all the news inputs will be done by out scraping exercise but coded manually. This decreases the subjectivity in the search terms and helps have a more consistent/comparable approach to teh data. 
 
 ## Media Sources
 
 ### Local
-1. To start with we will scrape the top-5 most-popular news websites (according to Alexa) for each country 
+1. To start with, we will scrape the top-5 most-popular news websites (according to Alexa) for each country. This way, we can "objectively" determine which ones are the most important papers in terms of views. Instead of relying on other algorithms like the one used by Google News.   
 2. We will also build a comprehensive list of digitially-available local media for later download + machine coding 
    * Wikipedia already has very good lists available
+   * The idea is to capture local media here that could give more reports on some of the activities we are interested. Our concern here is just that increasing the number of sources we can include a lot of noise into our data. 
 
 ### International
 1. BBC
