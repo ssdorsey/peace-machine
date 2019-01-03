@@ -193,3 +193,31 @@ def reuters_story(html):
                                    for image in image_containers]
     # return
     return hold_dict
+
+
+def star_story(html):
+    hold_dict={}
+    soup=BeautifulSoup(html, 'lxml')
+    header=header=soup2.find('div', {'class':'l-region l-region--title'})
+    #title
+    hold_dict['title']=header.find('div', {'class':'pane-content'}).text.strip()
+    # Authors
+    header_auth=soup.find('div', {'class':'panel-pane pane-entity-field pane-node-field-converge-byline'})
+    hold_dict['authors']=header_auth.find('div', {'class':'field__item even'}).text[3:].split(' and ')
+    #Date
+    hold_dict['date']=header.find('div', {'class':'field__item even'}).text
+    #section
+    hold_dict['section']=header_section.find('a',{'href':'/sections/national-news_c29654'}).text
+    #text
+    body=soup.find('div', {'class':'field field-name-body'})
+    hold_dict['text']= [paragraph.text for paragraph in body.find_all('p')]
+    #image and caption - couldn't separate them or define only for the images we care about
+    #1. Retriving a string not sure how to separate it for every case
+    image_containers = soup.find_all('div', {'class':'panel-pane pane-page-content'})
+    hold_dict['image']= [image.find('div', {'class':re.compile('field__item even')}) for
+              image in image_containers]
+    #2. Retrieving the information of all images not only the one in the text
+    hold_dict['srcs'] = [img['src'] for img in soup2.find_all('img')]
+    hold_dict['alts'] = [img['alt'] for img in soup2.find_all('img')]
+
+    return hold_dict
