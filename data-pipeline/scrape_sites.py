@@ -113,6 +113,33 @@ def reuters_collect():
             pass
 
 
+def aljazeera_gen(year):
+    """
+	Note: the sitemap for al jazeera is split by year. Creates date-formatted
+	links to the aljazeera sitemaps
+    """
+    return f'https://www.aljazeera.com/xml/sslsitemaps/sitemap{year}_1.xml'
+
+
+def collect_aljazeera():
+    """
+    main function to collect all the AJ links. sitemap urls only contain years, not months,
+    so comment out the months below. 
+    """
+    # all the years we want from AJ -- only have sitemaps from 2003 on. 
+    years = range(2003, 2019)
+    # all the months we want from AJ
+    #months = range(1, 13)
+    # create a list of all the sitemap urls
+    aljazeera_sitemaps = [aljazeera_gen(year) for year in years]
+    # loop through every sitemap and get the links
+    for sm in tqdm(aljazeera_sitemaps): # tqdm just gives us an easy progress tracker
+        links = read_sitemap(sm)
+        # save the links to a text file
+        with open('links/aljazeera.txt', 'a') as f:
+            for url in links:
+                f.write(url + '\n')
+
 # ------------------------------------------------------------------------------
 # functions for pulling info from the page
 # ------------------------------------------------------------------------------
@@ -384,3 +411,53 @@ def wapo_story(url):
 
 	return hold_dict
 
+def aljazeera_story(url):
+
+	#url = 'https://www.aljazeera.com/news/2019/01/sudan-targets-demonstrators-journalists-protests-continue-190122151114041.html'
+	#url = 'https://www.aljazeera.com/news/2019/01/manbij-attack-calls-turkey-cooperation-syria-190117104601190.html'
+
+	#create a dictionary to hold everything in
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title
+	title_box = soup.find('h1', attrs={'class':'post-title'})
+	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
+
+	#get the authors. not all articles have authors, especially wire reports.
+	hold_dict['authors'] = list(set([a.text.strip() for a in soup.find_all('a', attrs={'rel':'author'})]))
+
+	#get the date.
+	date_box = soup.find('div', attrs={'class':'article-duration'})
+	hold_dict['date'] = date_box.text.strip()
+
+	#get section
+	section_box = soup.find('li', attrs={'id':'articlestoptopic'})
+	hold_dict['section'] = section_box.text.strip()
+
+	#get the text.
+	text_box = soup.find('div', attrs={'class':'article-p-wrapper'})
+	hold_dict['text'] = [p.text.strip() for p in text_box.find_all('p')]
+
+	#get the article first paragraph
+	abstract_box = soup.find('p', attrs={'class':'article-heading-des'})
+	hold_dict['abstract'] = abstract_box.text.strip()
+
+	#no reported location for this publication.
+
+	#get the source
+	source_box = soup.find('div', attrs={'class':'article-body-artSource'})
+	hold_dict['Source'] = source_box.text.strip()
+
+	#get the images
+	image_box = soup.find_all('img',attrs={'class':re.compile('img-responsive')})
+	hold_dict['image_urls'] = [i['src'] for i in image_box]
+
+	#get the captions
+	caption_box = soup.find_all('figcaption', attrs={'class':'main-article-caption'})
+	hold_dict['image_captions'] = [caption.text.strip() for caption in caption_box]
+
+	return hold_dict
