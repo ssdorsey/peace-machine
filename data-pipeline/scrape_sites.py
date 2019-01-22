@@ -196,55 +196,10 @@ def reuters_story(html):
 
 
 def bamada_story:
-#Bamada:
-#Note: website is in French.
-#No sitemap.
-#sampleurl = 'http://bamada.net/le-ministre-nango-dembele-face-aux-acteurs-de-la-filiere-mangue-a-sikasso-il-ne-saurait-y-avoir-de-mangues-de-bonne-qualite-sans-vergers-exempts-de-toute-infestation-des-mouches'
-
-#bamada.net/robots.txt:
-
-"""
-User-agent: *
-# On empÃªche l'indexation des dossiers sensibles
-Disallow: /cgi-bin
-Disallow: /wp-admin
-Disallow: /wp-includes
-Disallow: /wp-content/plugins
-Disallow: /wp-content/cache
-Disallow: /wp-content/themes
-Disallow: /trackback
-Disallow: /feed
-Disallow: /comments
-Disallow: /category/*/*
-Disallow: */trackback
-Disallow: */feed
-Disallow: */comments
-Disallow: /*?*
-Disallow: /*?
-# On autorise l'indexation des images
-Allow: /wp-content/uploads
-User-agent: Googlebot
-# On empÃªche l'indexation des fichiers sensibles
-Disallow: /*.php$
-Disallow: /*.js$
-Disallow: /*.inc$
-Disallow: /*.css$
-Disallow: /*.gz$
-Disallow: /*.swf$
-Disallow: /*.wmv$
-Disallow: /*.cgi$
-Disallow: /*.xhtml$
-# Autoriser Google Image
-User-agent: Googlebot-Image
-Disallow:
-Allow: /*
-# Autoriser Google AdSense
-User-agent: Mediapartners-Google*
-Disallow:
-Allow: /*
-# On indique au spider le lien vers notre sitemap
-Sitemap: http://bamada.net/sitemapindex.xml
-"""
+	#Bamada:
+	#Note: website is in French.
+	#No sitemap.
+	#sampleurl = 'http://bamada.net/le-ministre-nango-dembele-face-aux-acteurs-de-la-filiere-mangue-a-sikasso-il-ne-saurait-y-avoir-de-mangues-de-bonne-qualite-sans-vergers-exempts-de-toute-infestation-des-mouches'
 
 	hold_dict = {}
 
@@ -252,7 +207,7 @@ Sitemap: http://bamada.net/sitemapindex.xml
 	html = urllib.request.urlopen(req).read()
 	soup = BeautifulSoup(html, 'lxml')
 
-	#get title. this works.
+	#get title. 
 	title_box = soup.find('h3',{'id':'post-title'})
 	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
 
@@ -284,7 +239,7 @@ Sitemap: http://bamada.net/sitemapindex.xml
 
 	#don't seem to be any captions.
 
-    return hold_dict
+	return hold_dict
 
 def malijet_story(url):
 
@@ -338,8 +293,9 @@ def malijet_story(url):
 
 def Guardian_story(url):
 
-	url = 'https://www.theguardian.com/world/2019/jan/18/zimbabwe-activists-protests-crackdown-spectre-of-mugabe-era'
+	#url = 'https://www.theguardian.com/world/2019/jan/18/zimbabwe-activists-protests-crackdown-spectre-of-mugabe-era'
 	#url = 'https://www.theguardian.com/world/2019/jan/18/fiji-urges-australia-not-to-put-coal-above-pacific-nations-battling-climate-change'
+	
 	#create a dictionary to hold everything in
 	hold_dict = {}
 
