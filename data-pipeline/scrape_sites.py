@@ -193,3 +193,47 @@ def reuters_story(html):
                                    for image in image_containers]
     # return
     return hold_dict
+
+def businessnews_story(html):
+    # create a dictionary to hold everything in
+    hold_dict = {}
+    # first turn the html into BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+    # pull the data I want
+    # all the initial data I want is in the header so I restrict my search
+        # so as to not accidentially pull in other  data
+    # title
+    hold_dict['title'] = soup.find('h1', {'class':'headline'}).text
+
+    # date
+    date = soup.find('div', {'id':'post-info-left'}).text
+    hold_dict['date'] = date.split("on")[-1]
+    '''
+    #author
+    hold_dict["author"]= soup.find('div', {'class':'mvp-author-info-name left relative'}).text
+    '''
+    # section how can I get the thing just before the title? It gives the section information.
+    section = soup.find('div', {"id": "crumbs"}).text
+    hold_dict['section'] = section.split(">")[-2]
+
+    # text there is some empty stuff at  the end
+    body = soup.find('div', {'id':'content-area'})
+    text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
+    # removing \xa0 s which are at the end mostly.
+    text = [ii.replace("\xa0", "") for ii in text]
+    # getting rid of empy strings
+    text = list(filter(None, text))
+    # some news are from other news sources which are indicated with [] at the end. Getting rid of those
+    text = [item for item in text if not (item.startswith('[') and item.endswith(']'))]
+    hold_dict['text'] = text
+
+    # images (in order): this website does not use images. Rarely, they use them but they are included as paragraph items and they do not have separate tags.
+    #hold_dict['image_urls'] = soup.find('div', {'class':'left relative mvp-post-feat-img-wide2'})
+    # return
+    return hold_dict
+
+url = 'http://businessnews.com.ng/2017/06/02/no-date-for-budget-assent-presidency/'
+hdr = {'User-Agent': 'Mozilla/5.0'} #known browser is needed for website, otherwise I got an forbidden error
+request=urllib.request.Request(url, None, hdr) #The assembled request
+html = urllib.request.urlopen(request)
+businessnews_ng=businessnews_story(html)
