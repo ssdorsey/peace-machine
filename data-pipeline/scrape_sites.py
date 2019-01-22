@@ -193,3 +193,238 @@ def reuters_story(html):
                                    for image in image_containers]
     # return
     return hold_dict
+
+
+def bamada_story:
+#Bamada:
+#Note: website is in French.
+#No sitemap.
+#sampleurl = 'http://bamada.net/le-ministre-nango-dembele-face-aux-acteurs-de-la-filiere-mangue-a-sikasso-il-ne-saurait-y-avoir-de-mangues-de-bonne-qualite-sans-vergers-exempts-de-toute-infestation-des-mouches'
+
+#bamada.net/robots.txt:
+
+"""
+User-agent: *
+# On empÃªche l'indexation des dossiers sensibles
+Disallow: /cgi-bin
+Disallow: /wp-admin
+Disallow: /wp-includes
+Disallow: /wp-content/plugins
+Disallow: /wp-content/cache
+Disallow: /wp-content/themes
+Disallow: /trackback
+Disallow: /feed
+Disallow: /comments
+Disallow: /category/*/*
+Disallow: */trackback
+Disallow: */feed
+Disallow: */comments
+Disallow: /*?*
+Disallow: /*?
+# On autorise l'indexation des images
+Allow: /wp-content/uploads
+User-agent: Googlebot
+# On empÃªche l'indexation des fichiers sensibles
+Disallow: /*.php$
+Disallow: /*.js$
+Disallow: /*.inc$
+Disallow: /*.css$
+Disallow: /*.gz$
+Disallow: /*.swf$
+Disallow: /*.wmv$
+Disallow: /*.cgi$
+Disallow: /*.xhtml$
+# Autoriser Google Image
+User-agent: Googlebot-Image
+Disallow:
+Allow: /*
+# Autoriser Google AdSense
+User-agent: Mediapartners-Google*
+Disallow:
+Allow: /*
+# On indique au spider le lien vers notre sitemap
+Sitemap: http://bamada.net/sitemapindex.xml
+"""
+
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title. this works.
+	title_box = soup.find('h3',{'id':'post-title'})
+	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
+
+	#get the authors
+	author_date_box = soup.find('div', {'class': 'post-info'})
+	authors_box = author_date_box.find("a")
+	hold_dict['authors'] = authors_box['title'].strip()
+
+	#get the date. Note: format dd/mm/yyyy
+	hold_dict['date'] = author_date_box.contents[3].text.strip()
+
+	#get the section
+	section_box = soup.find('h5',{'class':'site-description'})
+	hold_dict['section'] = section_box.text.strip()
+
+	#no reported location
+
+	#get the text
+	text_box = soup.find('div', attrs={'id':'article'})
+	hold_dict['text'] = text_box.text.strip()
+
+	#get the first paragraph
+	#it's surrounded by the <span> and </span> tags. I think the below code is right.
+	hold_dict['first_paragraph'] = soup.find('div', id="article").p.text.strip()
+
+	#get the images. This doesn't work all the time, the subject of the regex isn't always consistent.
+	image_box = soup.find_all('img', {'class':re.compile('align')})
+	hold_dict['image_urls'] = [image['src'] for image in image_box if 'jpg' in image['src']]
+
+	#don't seem to be any captions.
+
+    return hold_dict
+
+def malijet_story(url):
+
+	#sampleurl: http://malijet.com/les_faits_divers_au_mali/221481-bamako-des-hommes-arm%C3%A9s-cambriolent-la-station-%26amp%3Bquot%3Bbaraka-.html
+	
+	#create a dictionary to hold everything in
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title
+	title_box = soup.find('h1', attrs={'class':'page_title'})
+	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
+
+	#get the authors
+	authors_box = soup.find('span', attrs={'class':'story_author'})
+	hold_dict['authors'] = authors_box.text.strip()
+
+	#get the date. note: weird format.
+	date_box = soup.find('span', attrs={'class':'story_date'})
+	hold_dict['date'] = date_box.text.strip()
+
+	#get section. get more specific here.
+	section_box = soup.find('div', attrs={'class':'box_breadcrumb'})
+	hold_dict['sections'] = section_box.find_all('a')[-1].text.strip()
+
+	#get the article abstract
+	abstract_box = soup.find('p', attrs={'class':'article_abstract'})
+	hold_dict['abstract'] = abstract_box.text.strip()
+
+	#get the text.
+	text_box = soup.find('div', attrs={'id':'article_body'})
+	hold_dict['text'] = [paragraph.text.strip() for paragraph in text_box.find_all('p') if not paragraph.has_attr('class')]
+
+	#get first nonempty paragraph after the abstract
+	hold_dict['first_paragraph'] = [paragraph.text.strip() for paragraph in text_box.find_all('p') if paragraph.text.strip() != ''][1]
+
+	#no reported location for this publication.
+
+	#get the images
+	image_box = soup.find_all('img', attrs={'class':'img-responsive img-rounded'})
+	hold_dict['image_urls'] = [image['src'] for image in image_box if 'article' in image['src']]
+
+	#get the captions
+	caption_box = soup.find_all('span', attrs={'class':'image_caption'})
+	hold_dict['image_captions'] = [caption.text for caption in caption_box]
+
+    return hold_dict
+
+def Guardian_story(url):
+
+	url = 'https://www.theguardian.com/world/2019/jan/18/zimbabwe-activists-protests-crackdown-spectre-of-mugabe-era'
+	#url = 'https://www.theguardian.com/world/2019/jan/18/fiji-urges-australia-not-to-put-coal-above-pacific-nations-battling-climate-change'
+	#create a dictionary to hold everything in
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title
+	title_box = soup.find('h1', attrs={'class':'content__headline '})
+	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
+
+	#get the authors. not all articles have authors, especially wire reports.
+	hold_dict['authors'] = list(set([a.text.strip() for a in soup.find_all('span', attrs={'itemprop':'name'})]))
+
+	#get the date.
+	date_box = soup.find('time', attrs={'class':re.compile('content__dateline')})
+	hold_dict['date'] = date_box.text.strip()
+
+	#get section
+	section_box = soup.find('span', attrs={'class':'label__link-wrapper'})
+	hold_dict['section'] = section_box.text.strip()
+
+	#get the text.
+	text_box = soup.find('div', attrs={'class':re.compile('content__article-body')})
+	hold_dict['text'] = [p.text.strip() for p in text_box.find_all('p')]
+
+	#get the article first paragraph
+	abstract_box = soup.find('div', attrs={'class':'content__standfirst'})
+	hold_dict['abstract'] = abstract_box.text.strip()
+
+	#no reported location for this publication.
+
+	#get the images
+	image_box = soup.find_all('img',attrs={'class':'gu-image'})
+	hold_dict['image_urls'] = [i['src'] for i in image_box]
+
+	#get the captions
+	caption_box = soup.find_all('figcaption', attrs={'class':re.compile('caption')})
+	hold_dict['image_captions'] = [caption.text.strip() for caption in caption_box]
+
+	return hold_dict
+
+def wapo_story(url):
+
+	#url = 'https://www.washingtonpost.com/local/immigration/getting-through-the-border-fence-was-easy-winning-the-right-to-stay-wont-be/2019/01/17/980ec59a-03ce-11e9-b5df-5d3874f1ac36_story.html?utm_term=.494b209cecdd'
+
+	#create a dictionary to hold everything in
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title
+	title_box = soup.find('h1', attrs={'data-pb-field':'custom.topperDisplayName'})
+	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
+
+	#get the authors
+	hold_dict['authors'] = list(set([a.text.strip() for a in soup.find_all('a', attrs={'class':'author-name'})]))
+
+	#get the date.
+	date_box = soup.find('span', attrs={'itemprop':'datePublished'})
+	hold_dict['date'] = date_box.text.strip()
+
+	#get section
+	section_box = soup.find('a', attrs={'class':'kicker-link'})
+	hold_dict['section'] = section_box.text.strip()
+
+	#get the article first paragraph
+	abstract_box = soup.find('p', attrs={'data-elm-loc':'1'})
+	hold_dict['abstract'] = abstract_box.text.strip()
+
+	#get the text.
+	text_box = soup.find('article', attrs={'itemprop':'articleBody'})
+	hold_dict['text'] = [p.text.strip() for p in text_box.find_all('p')]
+
+	#no reported location for this publication.
+
+	#get the images
+	image_box = [x.find('img',attrs={'class':'unprocessed'}) for x in soup.find_all('div',attrs={'class':re.compile('inline-content')}) if x.find('img',attrs={'class':'unprocessed'})]
+	hold_dict['image_urls'] = [i['data-hi-res-src'] for i in image_box]
+
+	#get the captions
+	caption_box = soup.find_all('span', attrs={'class':re.compile('pb-caption')})
+	hold_dict['image_captions'] = [caption.text.strip() for caption in caption_box]
+
+	return hold_dict
+
