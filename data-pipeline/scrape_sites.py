@@ -199,9 +199,7 @@ def businessnews_story(html):
     hold_dict = {}
     # first turn the html into BeautifulSoup
     soup = BeautifulSoup(html, "lxml")
-    # pull the data I want
-    # all the initial data I want is in the header so I restrict my search
-        # so as to not accidentially pull in other  data
+    
     # title
     hold_dict['title'] = soup.find('h1', {'class':'headline'}).text
 
@@ -212,11 +210,11 @@ def businessnews_story(html):
     #author
     hold_dict["author"]= soup.find('div', {'class':'mvp-author-info-name left relative'}).text
     '''
-    # section how can I get the thing just before the title? It gives the section information.
+    # Section is written just before the title which is at the end. This captures section.
     section = soup.find('div', {"id": "crumbs"}).text
     hold_dict['section'] = section.split(">")[-2]
 
-    # text there is some empty stuff at  the end
+    # text
     body = soup.find('div', {'id':'content-area'})
     text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
     # removing \xa0 s which are at the end mostly.
