@@ -193,3 +193,239 @@ def reuters_story(html):
                                    for image in image_containers]
     # return
     return hold_dict
+
+
+
+# Some no years or months, just a sequence:
+def xml_gen_seq(num):
+    return f'https://www.tribuneonlineng.com/post-sitemap{num}.xml'
+
+
+## GUARDIAN NIGERIA
+
+# sitemap in site_url = "https://guardian.ng/sitemap.xml"
+
+def parse_guardianng(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find(class_=re.compile(r'after-category')).text.replace("\xa0", "") 
+    author = soup.find(class_=re.compile(r'author')).text.strip().replace("By ", "")
+    hold_dict['authors'] = author.split(',')[0] # remove cities or positions
+    hold_dict['date'] = ' '.join(soup.find(class_=re.compile(r'manual-age')).text.split())
+    hold_dict['image_urls'] = []
+    hold_dict['image_captions'] = []
+    if soup.article.find_all('img'):
+        hold_dict['image_urls'] = [i['src'] for i in soup.article.find_all('img') if '/plugins/' not in i['src']]
+        captions = soup.find_all(class_=re.compile(r'caption'))
+        hold_dict['image_captions'] = list(set([c.text.strip() for c in captions]))
+    # First paragraph always hanging without tag. If all text, also caption. 
+    # So take all text and remove matched caption on first par only. Hence finding captions first
+    body = soup.find('article').text 
+    hold_dict['paragraphs'] =  list(filter(None, body.split('\n'))) # getting paragraphs indexed by line breaks; if by 'p', first par is lost. Remove potential empty ones.
+    if hold_dict['image_captions']:
+        hold_dict['paragraphs'][0] = hold_dict['paragraphs'][0].replace(hold_dict['image_captions'][0], '') #remove caption match
+        hold_dict['paragraphs'] = list(filter(None,  hold_dict['paragraphs'])) # Remove empty ones. Important to do this again in case all caption was first par  
+    return(hold_dict)
+
+
+# example url: https://guardian.ng/news/putin-warns-of-consequences-over-orthodox-split/        
+# Check links 
+# =============================================================================
+# urls = open('guardianng.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_guardianng(html)
+#     print(url)
+#     sleep(1)
+# =============================================================================
+    
+
+## THE PUNCH NIGERIA
+
+# sitemap in: "https://punchng.com/sitemap.xml"
+    
+def parse_punch(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find('h1', class_='post_title').text    
+    # Again, location shows up on author string, separated by a comma. So:  
+    hold_dict['authors'] = []
+    if soup.article.find("strong"):
+        hold_dict['authors'] = soup.article.find("strong").text.split(',')[0]
+    if "Copyright PUNCH." in hold_dict['authors'] or "READ ALSO" in hold_dict['authors']:
+        hold_dict['authors'] = []
+    hold_dict['date'] = soup.find('time', class_=re.compile(r'entry-date published')).text   
+    pars = [paragraph.text.strip() for paragraph in soup.find('div', class_='entry-content').find_all('p')] # there were some empty paragraphs        
+    if len(pars)==0: # means all text in one 'p', sep by '\n' instead
+        pars = soup.find('div', class_='col-md-12 col-lg-8').find_all('div')
+        pars = [p.text.replace("\n","") for p in pars]  # Best I could do for these rare cases.       
+    if hold_dict['authors']:
+        if hold_dict['authors'] in pars[0]: ## If author names appear in first paragraph of text, out
+            pars = pars[1:len(pars)]
+    hold_dict['paragraphs'] =  list(filter(None, pars)) # assign pars and remove empty ones
+    # One last refinement to authors: news agencies often appear in last paragraph, catching some at least:
+    if ('AFP' or 'Reuters' or 'NAN' or 'AP') in pars[len(pars)-1]:
+        hold_dict['authors'] = pars[len(pars)-1].replace('(', '').replace(')', '')
+    image_url = soup.find_all('div', class_='blurry')[0]['style']
+    hold_dict['image_urls'] = image_url[image_url.find("(")+2:image_url.find(")")-1] # can't split here, have to substring
+    hold_dict['image_captions'] = []
+    if soup.find('span', class_='caption'):
+        hold_dict['image_captions'] = soup.find('span', class_='caption').text              
+    return(hold_dict)
+    
+# example url: https://punchng.com/nigerian-air-force-redeploys-27-air-marshals-45-senior-officers/
+# Check links 
+# =============================================================================
+# urls = open('punchng.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_punchng(html)
+#     print(url)
+#     sleep(1)
+# =============================================================================
+ 
+    
+## VANGUARD NIGERIA
+
+# sitemap in "http://www.vanguardngr.com/sitemap_index.xml"
+
+import numpy as np   
+def parse_vanguard(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find('h1', {'class': 'entry-title'}).text    
+    if soup.find('time', {'class': 'entry-date published'}): # some don't have date
+        hold_dict['date'] = soup.find('time', {'class': 'entry-date published'}).text
+    else:
+        hold_dict['date'] = soup.find('meta', property='article:published_time')['content'].split('T')[0]
+            # I don't do this for all because it's GMT and slightly inaccurate
+    hold_dict['authors'] = []
+    if soup.find('div', id="rtp-author-box"):
+        hold_dict['authors'] = soup.find('div', id="rtp-author-box").find('h2').text # Is nested finds an elegant solution? 
+            # Sometimes no author
+    pars = [p.text for p in soup.find('article').find_all('p') if p.text is not ''] # there were some empty paragraphs
+    # If no 'By ' within first  two paragraphs, it's all text. If 'By ', there's author and often subheaders. If 'by' is in small caps, I'm not sure what could be done. 
+    if 'By' in str(pars[0:2]):     
+        # Remove crap at the top, including author:
+        pos = int(np.where(["By" in s for s in pars[0:2]])[0])
+        hold_dict['paragraphs'] = pars[pos+1:len(pars)]
+        # Extract new author from text:
+        hold_dict['authors'] += ''.join(", " + pars[pos][3:len(pars[pos])])
+    elif len(pars) is 0: 
+        hold_dict['paragraphs'] = soup.find('article').text
+    else:   
+        hold_dict['paragraphs'] = pars
+    #Small bug when ONLY first par is separated by \n but rest by \p. Incredible but true. Fix:
+    if '\n' in hold_dict['authors']:
+        hold_dict['paragraphs'] = [hold_dict['authors'].split('\n')[1]] + hold_dict['paragraphs']   
+        hold_dict['authors'] = hold_dict['authors'].split('\n')[0]
+    # Images. When none, no caption. When one or more:
+    imgs = soup.article.find_all('img', class_=re.compile(r'size-full'))[1::2] # only odd elements. Even elements are irrelevant 
+    hold_dict['image_urls'] = [s['src'] for s in imgs]
+    if soup.find('figcaption'):
+        hold_dict['image_captions'] = [c.text for c in soup.findAll('figcaption')]
+    else:
+        hold_dict['image_captions'] = []       
+    return(hold_dict)
+
+# example url: https://www.vanguardngr.com/2019/01/video-kwara-apcs-governorship-candidate-abdulrazaq-shuts-down-ilorin/
+# Check links 
+# =============================================================================
+# urls = open('vanguard.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_vanguard(html)
+#     print(url)
+#     sleep(1)
+# =============================================================================
+    
+   
+
+## CHAMPION NIGERIA
+    
+# sitemap in: "http://www.championnews.com.ng/sitemap_index.xml"
+   
+def parse_champion(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find('h1', {'class': 'entry-title'}).text
+    hold_dict['date'] = soup.find('time', {'class':re.compile(r'entry-date')}).text
+    body = soup.article.find_all('p')
+    pars = [par.text for par in body]  
+    if soup.find(class_=re.compile(r'caption')):
+        hold_dict['image_captions'] = soup.find(class_=re.compile(r'caption')).text 
+        pars = [par.split('\n') for par in pars if par != hold_dict['image_captions']]
+        pars = sum(pars,[]) #unlist one
+        #if they exist, image captions are first paragraph, hence odd placement here
+    else:
+         hold_dict['image_captions'] = []
+        # image caption removed if it happens to be first paragraph --rare but needs to be done    
+    if pars[0].split(' ')[0].isupper(): # best I could think of is consistency around caps for author names
+        hold_dict['author'] = pars[0].split(',')[0] #sometimes city is in there
+        hold_dict['paragraphs'] = [par.split('\n') for par in pars if hold_dict['author'] not in par]
+    else:
+        hold_dict['author'] = []
+        hold_dict['paragraphs'] = [par.split('\n') for par in pars]
+    if not hold_dict['paragraphs']:
+        hold_dict['paragraphs'] = pars
+            # have to dump everything at some point, this is already a condition fest
+    hold_dict['image_urls'] = []
+    if soup.article.find('img', {'class':'entry-thumb'}):
+        hold_dict['image_urls'] = soup.article.find('img', {'class':'entry-thumb'})['src']
+    return(hold_dict)
+   
+    
+# example url: "http://www.championnews.com.ng/inec-speaks-possibility-postponing-elections/"
+# Check links 
+# =============================================================================
+# urls = open('champion.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_champion(html)
+#     print(url)
+#     sleep(0.5)
+# =============================================================================
+
+
+
+## TRIBUNE NIGERIA
+
+# sitemap in: https://www.tribuneonlineng.com/sitemap_index.xml"
+
+def parse_tribune(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find(class_=re.compile(r'post-title')).text     
+    hold_dict['authors'] = soup.find(class_=re.compile(r'author')).text.strip().replace("By ", "").split(' -')[0]    
+    hold_dict['date'] = soup.time.find('b').text
+    article_body = soup.find('article').find_all('p')
+    pars = [paragraph.text.strip() for paragraph in article_body]   
+    hold_dict['paragraphs'] = [p.replace('\xa0', '') for p in pars if p is not '']
+    if soup.article.find_all('img'):
+        names = [i['data-src'] for i in soup.article.find_all('img')]
+        hold_dict['image_urls'] = list(set(names))
+        captions = soup.find_all(class_=re.compile(r'caption'))
+        captions = list(set([c.text.strip() for c in captions]))
+        hold_dict['image_captions'] = [c for c in captions if c is not '']
+    else: 
+        hold_dict['image_urls'] = []
+        hold_dict['image_captions'] = []
+    return(hold_dict)
+    
+# Body of text should be cleaner, but the page is too inconsistent to find a solid solution
+# example url: https://www.tribuneonlineng.com/172684/
+# Check links 
+# =============================================================================
+# urls = open('tribune.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_tribune(html)
+#     print(url)
+#     sleep(0.5)
+# =============================================================================
+   
+
+  
+       
+    
+    
