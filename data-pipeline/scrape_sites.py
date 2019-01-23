@@ -139,6 +139,57 @@ def collect_aljazeera():
         with open('links/aljazeera.txt', 'a') as f:
             for url in links:
                 f.write(url + '\n')
+		
+def dw_gen(start_month, start_year, end_month, end_year):
+    """
+    creates date-formatted links to the dw sitemaps
+    """
+    # checks for a 2-digit month format, ex: '02'
+    if not type(start_month) is str:
+        start_month = str(start_month)
+        start_month = f'{start_month:02}'
+        # if len(start_month) < 2:
+        #     start_month = '0' + start_month
+    if not type(end_month) is str:
+        end_month = str(end_month)
+        end_month = f'{end_month:02}'
+        # if len(start_month) < 2:
+        #     start_month = '0' + start_month
+    return f'https://www.dw.com/en/sitemap-detail-from-{start_year}-{start_month}-01-to-{end_year}-{end_month}-01.xml'
+
+
+def collect_dw():
+    """
+    main function to collect all the dw links
+    """
+    # all the months and years we want from DW
+    m = range(1, 13)
+    startyear = 2002
+    endyear = 2020
+    numyears = endyear - startyear
+    nummonths = numyears * 12
+    #get the months and years in right quarterly format
+    mth = [month % 12 + 1 for month in range(0,nummonths)]
+    mth = [f'{month:02}' for month in mth]
+    yr = [month // 12 + startyear for month in range(0,nummonths)]
+    date = pd.DataFrame({'mth':mth,'yr':yr})
+    date = date[(date['mth'] == '01') | (date['mth'] == '04') | (date['mth'] == '07') | (date['mth'] == '10')]
+    date = date[:-2]
+    #make each month variable
+    start_month = [date['mth'].iloc[d] for d in range(0, len(date['mth']))]
+    start_year = [date['yr'].iloc[d] for d in range(0, len(date['mth']))]
+    end_month = [date['mth'].iloc[d] for d in range(1, len(date['mth']))]
+    end_year = [date['yr'].iloc[d] for d in range(1, len(date['mth']))]
+    # create a list of all the sitemap urls
+    dw_sitemaps = [dw_gen(start_month[i], start_year[i], end_month[i], end_year[i]) for i in range(len(end_month))]
+    # loop through every sitemap and get the links
+    for sm in tqdm(dw_sitemaps): # tqdm just gives us an easy progress tracker
+        links = read_sitemap(sm)
+        # save the links to a text file
+        with open('links/dw.txt', 'a') as f:
+            for url in links:
+                f.write(url + '\n')
+
 
 # ------------------------------------------------------------------------------
 # functions for pulling info from the page
@@ -461,3 +512,53 @@ def aljazeera_story(url):
 	hold_dict['image_captions'] = [caption.text.strip() for caption in caption_box]
 
 	return hold_dict
+
+
+def dw_story(url):
+
+    #url = 'https://www.dw.com/en/obasanjo-disputed-elections-are-better-than-no-elections/a-47181718'
+    #url = 'https://www.dw.com/en/uk-pm-theresa-may-to-take-brexit-options-back-to-eu-negotiators/a-47170783'
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    #get title
+    hold_dict['title'] = soup.find('h1').text.strip()
+
+    #get the authors. not all articles have authors, especially wire reports.
+    author_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Author\s+', x.text.strip())]))
+    rest = author_box.split('\\n', 1)[1]
+    hold_dict['author'] = rest.split(' (',1)[0]
+
+    #get the date. format dd.mm.yyyy
+    date_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Date\s+', x.text.strip())]))
+    hold_dict['date'] = re.split('(\d{2}.\d{2}.\d{4})',date_box,1)[1]
+
+    #get section
+    hold_dict['section'] = soup.find('h4', attrs={'class':'artikel'}).text.strip()
+
+    #get the text.
+    text_box = soup.find('div', attrs={'class':'longText'})
+    hold_dict['text'] = [p.text.strip() for p in text_box.find_all('p')]
+
+    #get the article first paragraph
+    hold_dict['abstract'] = soup.find('p', attrs={'class':'intro'}).text.strip()
+
+    #no reported location for this publication.
+
+    #get the images
+    image_box = [x for x in soup.find_all('a', attrs={'class':re.compile('overlayLink')}) if str(x).find('img') > 0]# if str(x).find('title="') > 0]
+    rest2 = [str(x).split('<img')[1] for x in image_box]
+    srcs = [str(x).split('src="')[1] for x in rest2]
+    hold_dict['image_urls'] = [str(x).split('" title=')[0] for x in srcs]
+
+    #get the captions
+    rest3 = [str(x).split('alt="')[1] for x in image_box]
+    hold_dict['image_captions'] = [str(x).split('" ')[0] for x in rest3]
+
+    return hold_dict
+
