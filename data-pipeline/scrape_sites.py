@@ -383,7 +383,7 @@ def parse_champion(html):
 #     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
 #     parse_champion(html)
 #     print(url)
-#     sleep(0.5)
+#     sleep(1)
 # =============================================================================
 
 
@@ -421,10 +421,58 @@ def parse_tribune(html):
 #     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
 #     parse_tribune(html)
 #     print(url)
-#     sleep(0.5)
+#     sleep(1)
 # =============================================================================
    
 
+
+## SAHARA REPORTS
+
+# sitemap in:  "http://saharareporters.com/sitemap.xml"
+
+def parse_sahararep(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find('title').text.strip().split(' By')[0].split('|')[0].split('-')[0].encode('ascii', 'ignore').decode()
+    # extra info in title can be separated by 'By', '|' or '-'...
+    author = soup.find('span', {'class':re.compile(r'attribution')}).text.replace("By ", "").replace("by ", "")
+    hold_dict['authors'] = author.encode('ascii', 'ignore').decode() 
+    # sometimes unicode carachters creep in both in title and author; strip doesn't remove them
+    hold_dict['date'] = soup.find('span', {'class':re.compile(r'date')}).text.strip()
+    article_body = soup.find('div', {'class':'story-content'})
+    pars = [p.text.strip() for p in article_body.find_all('p')]
+    hold_dict['paragraphs'] = list(filter(None, pars))
+    hold_dict['image_urls'] = [] # No captions in any link I've explored
+    if soup.find('div', {'class':'story-content'}).find('img'):
+        hold_dict['image_urls'] = soup.find('div', {'class':'story-content'}).find('img')['src']
+    hold_dict['image_captions'] = [] 
+    # Other fixes:
+    # Sometimes saharareporters in first paragraph of text:
+    if 'Saharareporters' in hold_dict['paragraphs'][0]:
+        hold_dict['paragraphs'] = hold_dict['paragraphs'][1:len(hold_dict['paragraphs'])]
+    # Sometimes author in first/second paragraph of text, even if authorship attributed to 'saharareports'
+    if 'By' in str(hold_dict['paragraphs'][0:2]):     
+        # Remove crap at the top, including author:
+        pars = hold_dict['paragraphs'] # just to make code more legible
+        pos = int(np.where(["By" in s for s in pars[0:2]])[0])
+        hold_dict['paragraphs'] = pars[pos+1:len(pars)]
+        # Extract new author from text:
+        hold_dict['authors'] += ''.join(", " + pars[pos][3:len(pars[pos])].encode('ascii', 'ignore').decode('utf-8'))
+    # One last replace for paragraphs so it removes unicode crap strip() can't handle. Replace better than encoding here
+    hold_dict['paragraphs'] = [p.replace(u'\xa0', u' ') for p in hold_dict['paragraphs']]
+    return(hold_dict)
+         
+# example url: http://saharareporters.com/2006/10/22/fayose-lagos-plot-return-him-power-thickens
+# Check links 
+# =============================================================================
+# urls = open('sahararep.txt', "r").read().splitlines() 
+# for url in tqdm(urls):   
+#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
+#     parse_sahararep(html)
+#     print(url)
+#     sleep(1)
+# =============================================================================
+   
   
        
     
