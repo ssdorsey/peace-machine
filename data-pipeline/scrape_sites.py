@@ -564,4 +564,59 @@ def dw_story(html):
 
     return hold_dict
 
+def france24_story(url):
+	"""
+	collecting story data for france 24. 
+	can't figure out a good way to get images or captions to work for this one.
+	"""
+
+	url = 'https://www.france24.com/en/20190123-yellow-vests-french-riot-police-now-wear-body-cameras'
+
+	#create a dictionary to hold everything in
+	hold_dict = {}
+
+	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	html = urllib.request.urlopen(req).read()
+	soup = BeautifulSoup(html, 'lxml')
+
+	#get title
+	hold_dict['title'] = soup.find('h1', attrs={'class':re.compile('t-content__title')}).text.strip()
+
+	#get the authors. not all articles have authors, especially wire reports.
+	#soup.find_all('span',attrs={'class':'m-from-author__name'})
+	hold_dict['author'] = str(set([x.text.strip() for x in soup.find_all('span',attrs={'class':'m-from-author__name'})]))
+	# if re.match(r'Author\s+', x.text.strip())]))
+
+	#get the date. format dd.mm.yyyy
+	date_box = [x.text.strip() for x in soup.find_all('span',attrs={'class':'m-pub-dates__date'})]
+	hold_dict['publish_date'] = date_box[0]
+	hold_dict['latest_update_date'] = date_box[-1]
+
+	#get section
+	hold_dict['section'] = soup.find('a', attrs={'class':'m-breadcrumb__list__item__link'}).text.strip()
+
+	#get the text.
+	text_box = soup.find('div', attrs={'class':'t-content__body'})
+	hold_dict['text'] = [p.text.strip() for p in text_box.find_all('p')]
+
+	#get the article first paragraph
+	hold_dict['abstract'] = soup.find('p', attrs={'class':'t-content__chapo'}).text.strip()
+
+	#no reported location for this publication.
+
+	#get the images
+	#not done here yet
+	# image_box = soup.find_all('div', {'class':'t-content__main-media'})
+	# a = [x.find('img') for x in image_box]
+	# b = [a.find('src') for x in a]
+	# [x['src'] for x in soup.find_all('img', attrs={'class':'m-figure__img'})]
+	#hold_dict['image_urls'] =
+
+	#get the captions
+	#not done here yet either, this will come with images.
+	# hold_dict['image_captions'] = [str(x).split('" ')[0] for x in rest3]
+
+	return hold_dict
+
+
 
