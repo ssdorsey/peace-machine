@@ -513,30 +513,32 @@ def aljazeera_story(url):
 
 	return hold_dict
 
-
-def dw_story(url):
-
+def dw_story(html):
+    """get story data for dw urls. """
     #url = 'https://www.dw.com/en/obasanjo-disputed-elections-are-better-than-no-elections/a-47181718'
     #url = 'https://www.dw.com/en/uk-pm-theresa-may-to-take-brexit-options-back-to-eu-negotiators/a-47170783'
 
     #create a dictionary to hold everything in
     hold_dict = {}
 
-    req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
-    html = urllib.request.urlopen(req).read()
+    #req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    #html = urllib.request.urlopen(req).read()
     soup = BeautifulSoup(html, 'lxml')
 
     #get title
     hold_dict['title'] = soup.find('h1').text.strip()
 
     #get the authors. not all articles have authors, especially wire reports.
-    author_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Author\s+', x.text.strip())]))
-    rest = author_box.split('\\n', 1)[1]
-    hold_dict['author'] = rest.split(' (',1)[0]
+    smallList = soup.find('ul', {'class':'smallList'})
+    #author_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Author\s+', x.text.strip())]))
+    #rest = author_box.split('\\n', 1)[1]
+    #hold_dict['author'] = rest.split(' (',1)[0]
+    hold_dict['author'] = smallList.find(text='Author').parent.next_sibling.strip().split(',')
 
     #get the date. format dd.mm.yyyy
-    date_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Date\s+', x.text.strip())]))
-    hold_dict['date'] = re.split('(\d{2}.\d{2}.\d{4})',date_box,1)[1]
+    #date_box = str(set([x.text.strip() for x in soup.find_all('li') if re.match(r'Date\s+', x.text.strip())]))
+    #hold_dict['date'] = re.split('(\d{2}.\d{2}.\d{4})',date_box,1)[1]
+    hold_dict['date'] = smallList.find(text='Date').parent.next_sibling.strip().split(',')
 
     #get section
     hold_dict['section'] = soup.find('h4', attrs={'class':'artikel'}).text.strip()
@@ -551,7 +553,7 @@ def dw_story(url):
     #no reported location for this publication.
 
     #get the images
-    image_box = [x for x in soup.find_all('a', attrs={'class':re.compile('overlayLink')}) if str(x).find('img') > 0]# if str(x).find('title="') > 0]
+    image_box = [x for x in soup.find_all('a', attrs={'class':re.compile('overlayLink')}) if str(x).find('img') > 0]
     rest2 = [str(x).split('<img')[1] for x in image_box]
     srcs = [str(x).split('src="')[1] for x in rest2]
     hold_dict['image_urls'] = [str(x).split('" title=')[0] for x in srcs]
@@ -561,4 +563,5 @@ def dw_story(url):
     hold_dict['image_captions'] = [str(x).split('" ')[0] for x in rest3]
 
     return hold_dict
+
 
