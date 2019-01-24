@@ -229,16 +229,8 @@ def parse_guardianng(html):
 
 
 # example url: https://guardian.ng/news/putin-warns-of-consequences-over-orthodox-split/        
-# Check links 
-# =============================================================================
-# urls = open('guardianng.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_guardianng(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
-    
+
+
 
 ## THE PUNCH NIGERIA
 
@@ -274,16 +266,8 @@ def parse_punch(html):
     return(hold_dict)
     
 # example url: https://punchng.com/nigerian-air-force-redeploys-27-air-marshals-45-senior-officers/
-# Check links 
-# =============================================================================
-# urls = open('punchng.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_punchng(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
- 
+
+
     
 ## VANGUARD NIGERIA
 
@@ -329,17 +313,8 @@ def parse_vanguard(html):
     return(hold_dict)
 
 # example url: https://www.vanguardngr.com/2019/01/video-kwara-apcs-governorship-candidate-abdulrazaq-shuts-down-ilorin/
-# Check links 
-# =============================================================================
-# urls = open('vanguard.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_vanguard(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
-    
-   
+
+
 
 ## CHAMPION NIGERIA
     
@@ -376,16 +351,6 @@ def parse_champion(html):
    
     
 # example url: "http://www.championnews.com.ng/inec-speaks-possibility-postponing-elections/"
-# Check links 
-# =============================================================================
-# urls = open('champion.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_champion(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
-
 
 
 ## TRIBUNE NIGERIA
@@ -412,21 +377,12 @@ def parse_tribune(html):
         hold_dict['image_captions'] = []
     return(hold_dict)
     
-# Body of text should be cleaner, but the page is too inconsistent to find a solid solution
+# Body of text should be cleaner at bottom, but the page is too inconsistent to find a solid solution
 # example url: https://www.tribuneonlineng.com/172684/
-# Check links 
-# =============================================================================
-# urls = open('tribune.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_tribune(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
-   
 
 
-## SAHARA REPORTS
+
+## SAHARA REPORTERS
 
 # sitemap in:  "http://saharareporters.com/sitemap.xml"
 
@@ -463,17 +419,48 @@ def parse_sahararep(html):
     return(hold_dict)
          
 # example url: http://saharareporters.com/2006/10/22/fayose-lagos-plot-return-him-power-thickens
-# Check links 
-# =============================================================================
-# urls = open('sahararep.txt', "r").read().splitlines() 
-# for url in tqdm(urls):   
-#     html = urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-#     parse_sahararep(html)
-#     print(url)
-#     sleep(1)
-# =============================================================================
-   
+
+
   
-       
     
+## THE SUN NIGERIA   
+  
+# sitemap in: https://www.sunnewsonline.com/sitemap-index-1.xml
     
+def parse_sun(html):
+    hold_dict = {}    
+    soup = BeautifulSoup(html, 'lxml')
+    hold_dict['title'] = soup.find('h1', {'class':re.compile(r'title')}).text
+    hold_dict['date'] = soup.find('div', {'class':re.compile(r'date')}).text.strip()
+    # Author really varies, but take author box now and then try append one in a 'p'
+    hold_dict['authors'] = soup.find('h3', {'class':re.compile(r'jeg_author_name')}).text.strip()
+    article_body = soup.find('div', {'class':'content-inner'})
+    pars = [p.text.encode('ascii', 'ignore').decode().split('\n') for p in article_body.find_all('p')]
+    hold_dict['paragraphs'] = [y for x in pars for y in x] #flatten list of lists
+    hold_dict['image_urls'] = []
+    try:
+        hold_dict['image_urls'] = soup.find('div', {'class':'jeg_inner_content'}).find('img')['data-src']
+    except:
+        pass
+    hold_dict['image_captions'] = [] # no captions in many links I looked at
+    # Other fixes:
+    # Author often in pars 1 or 2, starting with words 'from' or 'by'
+    preps = ['From', 'By', 'BY']
+    if any([prep in str(hold_dict['paragraphs'][0:4]) for prep in preps]) and len(hold_dict['paragraphs'])>=4:       
+        pars = hold_dict['paragraphs'] # just to make code more legible
+        pos = np.where([prep in str(s) for s in pars[0:4] for prep in preps])[0][0]
+        pos = int(np.where(pos<=2, 0, 
+                           (np.where(pos>2 and pos<=5, 1, 
+                                     (np.where(pos>5 and pos<=8,2,3))))))
+        hold_dict['paragraphs'] = pars[pos+1:len(pars)]
+        author = ' '.join(pars[pos].split(" ")[1:3]).replace(',','').replace('-','')
+        hold_dict['authors'] += ''.join(', ' + author)
+    # Sometimes first line is source, need to remove:
+    if 'Source:' in str(hold_dict['paragraphs'][0]) and len(hold_dict['paragraphs'])>2:
+        hold_dict['paragraphs'] = hold_dict['paragraphs'][1:len(hold_dict['paragraphs'])]
+    return(hold_dict)   
+    
+# example url: 'https://www.sunnewsonline.com/unilag-student-sets-new-record-graduates-with-5-cgpa
+
+
+
