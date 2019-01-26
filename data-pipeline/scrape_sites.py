@@ -124,9 +124,9 @@ def aljazeera_gen(year):
 def collect_aljazeera():
     """
     main function to collect all the AJ links. sitemap urls only contain years, not months,
-    so comment out the months below. 
+    so comment out the months below.
     """
-    # all the years we want from AJ -- only have sitemaps from 2003 on. 
+    # all the years we want from AJ -- only have sitemaps from 2003 on.
     years = range(2003, 2019)
     # all the months we want from AJ
     #months = range(1, 13)
@@ -139,7 +139,7 @@ def collect_aljazeera():
         with open('links/aljazeera.txt', 'a') as f:
             for url in links:
                 f.write(url + '\n')
-		
+
 def dw_gen(start_month, start_year, end_month, end_year):
     """
     creates date-formatted links to the dw sitemaps
@@ -285,7 +285,7 @@ def bamada_story:
 	html = urllib.request.urlopen(req).read()
 	soup = BeautifulSoup(html, 'lxml')
 
-	#get title. 
+	#get title.
 	title_box = soup.find('h3',{'id':'post-title'})
 	hold_dict['title'] = title_box.text.strip() #strip() is used to remove starting and trailing
 
@@ -322,7 +322,7 @@ def bamada_story:
 def malijet_story(url):
 
 	#sampleurl: http://malijet.com/les_faits_divers_au_mali/221481-bamako-des-hommes-arm%C3%A9s-cambriolent-la-station-%26amp%3Bquot%3Bbaraka-.html
-	
+
 	#create a dictionary to hold everything in
 	hold_dict = {}
 
@@ -373,7 +373,7 @@ def Guardian_story(url):
 
 	#url = 'https://www.theguardian.com/world/2019/jan/18/zimbabwe-activists-protests-crackdown-spectre-of-mugabe-era'
 	#url = 'https://www.theguardian.com/world/2019/jan/18/fiji-urges-australia-not-to-put-coal-above-pacific-nations-battling-climate-change'
-	
+
 	#create a dictionary to hold everything in
 	hold_dict = {}
 
@@ -566,7 +566,7 @@ def dw_story(html):
 
 def france24_story(url):
 	"""
-	collecting story data for france 24. 
+	collecting story data for france 24.
 	can't figure out a good way to get images or captions to work for this one.
 	"""
 
@@ -618,5 +618,44 @@ def france24_story(url):
 
 	return hold_dict
 
+def businessnews_story(html):
+    '''
+    This website does not use images. Occasionally, you can see them at the bottom of the text,
+    but they are added as additional paragraphs and they do not have separate tags to identify them.
+    There is also no author information. Note that I assign these two (image and author) as null below.
+    url = 'http://businessnews.com.ng/2011/03/21/nexim-to-join-commonwealth-lawyers-association-to-promote-trade/'
+    url = 'http://businessnews.com.ng/2017/10/19/reps-ask-npa-to-reverse-termination-of-agreement-with-intels/'
+    '''
+    hold_dict = {}
+    soup = BeautifulSoup(html, "lxml")
 
+    # title
+    hold_dict['title'] = soup.find('h1', {'class':'headline'}).text
 
+    # date. Month/Day/Year
+    date = soup.find('div', {'id':'post-info-left'}).text
+    hold_dict['date'] = date.split("on")[-1]
+
+    #author
+    hold_dict["author"]=[]
+
+    # section
+    section = soup.find('div', {"id": "crumbs"}).text
+    hold_dict['section'] = section.split(">")[-2]
+
+    # text
+    body = soup.find('div', {'id':'content-area'})
+    text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
+    # removing \xa0 s which are at the end mostly.
+    text = [ii.replace("\xa0", "") for ii in text]
+    # getting rid of empy strings
+    text = list(filter(None, text))
+    # some news are from other news sources which are indicated with [] at the end. Getting rid of those
+    text = [item for item in text if not (item.startswith('[') and item.endswith(']'))]
+    text = [item for item in text if not (item.startswith('Source :'))]
+    hold_dict['text'] = text
+
+    # images (in order): this website does not use images. Rarely, they use them but they are included as paragraph items and they do not have separate tags.
+    hold_dict['image_urls'] = []
+    # return
+    return hold_dict
