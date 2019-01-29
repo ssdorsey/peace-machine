@@ -593,7 +593,7 @@ def dw_story(html):
 
     return hold_dict
 
-def france24_story(url):
+def france24_story(html):
 	"""
 	collecting story data for france 24. 
 	can't figure out a good way to get images or captions to work for this one.
@@ -604,8 +604,8 @@ def france24_story(url):
 	#create a dictionary to hold everything in
 	hold_dict = {}
 
-	req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
-	html = urllib.request.urlopen(req).read()
+	#req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+	#html = urllib.request.urlopen(req).read()
 	soup = BeautifulSoup(html, 'lxml')
 
 	#get title
@@ -647,7 +647,7 @@ def france24_story(url):
 
 	return hold_dict
 
-def essor_story(url):
+def essor_story(html):
     """
     collecting story data for essor.
     note: this website is in French.
@@ -693,7 +693,7 @@ def essor_story(url):
 
     return hold_dict
 
-def maliweb_story(url):
+def maliweb_story(html):
     """
     collecting story data for maliweb.
     note: this website is in French.
@@ -705,8 +705,8 @@ def maliweb_story(url):
     #create a dictionary to hold everything in
     hold_dict = {}
 
-    req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
-    html = urllib.request.urlopen(req).read()
+    #req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    #html = urllib.request.urlopen(req).read()
     soup = BeautifulSoup(html, 'lxml')
 
     article_box = soup.find('div', attrs={'class':'td-post-content'})
