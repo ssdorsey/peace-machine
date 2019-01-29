@@ -218,6 +218,35 @@ def collect_maliweb():
             for url in links:
                 f.write(url + '\n')
 
+		
+
+def nation_gen():
+    """
+    i'm not sure how the sitemaps are split up with regard to date -- their
+    urls don't seem to index that way. there are two sitemaps and i can't tell
+    what the pattern is for which to publish to.
+    """
+    sitemaps = ['https://www.nation.co.ke/news-sitemap.xml', 'https://www.nation.co.ke/newssitemap.xml']
+'   return sitemaps
+    #this sitemap only contains daily. but I can't figure out
+
+
+def collect_nation():
+    """
+    i'm not sure how the sitemaps are split up with regard to date -- their
+    urls don't seem to index that way.
+    """
+    # all the years we want from the NYT
+    nation_sitemaps = nation_gen()
+    # loop through every sitemap and get the links
+    for sm in tqdm(nation_sitemaps): # tqdm just gives us an easy progress tracker
+        links = read_sitemap(sm)
+        # save the links to a text file
+        with open('links/nation.txt', 'a') as f:
+            for url in links:
+                f.write(url + '\n')
+
+
 
 
 # ------------------------------------------------------------------------------
@@ -740,3 +769,51 @@ def maliweb_story(html):
 
     return hold_dict
 
+def nation_story(html):
+    """
+    collecting story data for nation.
+    """
+
+    #url = 'https://www.nation.net/politique/corruption/corruption-au-mali-traquer-lhydre-2799525.html'
+    #url = 'https://www.nation.net/politique/revision-constitutionnelle-les-signaux-dune-nouvelle-tentative-vouee-a-lechec-2799490.html'
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    #req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    #html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    article_box = soup.find('article', attrs={'class':'article'})
+
+    #get title
+    hold_dict['title'] = soup.find('h2').text.strip()
+
+    #get the authors. not all articles have authors
+    author_box = article_box.find('section', attrs={'class':'author noprint'})
+    hold_dict['author'] = [x.text.strip() for x in author_box.find_all('strong')]
+    #last strong item in main content is the author.
+
+    #get the date. format dd.mmm.yyyy
+    hold_dict['date'] = soup.find('h6',).text.strip()
+
+    #get section(s)
+    hold_dict['section'] = [x.text.strip().split('\n')[-1] for x in soup.find_all('ol', attrs={'class':'breadcrumb'})]
+
+    #get the text.
+    hold_dict['text'] = [p.text.strip() for p in article_box.find_all('p')]
+
+    #get the article first paragraph
+    abstract_box = article_box.find('section',attrs={'class':'summary'})
+    hold_dict['abstract'] = [p.text.strip() for p in abstract_box.find_all('li')]
+
+    #reported location.
+    hold_dict['location'] = article_box.find('p', attrs={'class':'MsoNormal'}).text.strip()
+
+    #get the images
+    hold_dict['image_urls'] = [x['src'] for x in soup.find_all('img', attrs={'class':'photo_article'})]
+
+    #get the captions
+    hold_dict['image_captions'] = [x.text.strip() for x in soup.find_all('p', attrs={'id':'photo_article_caption'})]
+
+    return hold_dict
