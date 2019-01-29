@@ -618,5 +618,51 @@ def france24_story(url):
 
 	return hold_dict
 
+def essor_story(url):
+    """
+    collecting story data for essor.
+    note: this website is in French.
+    does not seem to have a sitemap, empty robots.txt file.
+    """
+
+    # url = 'https://www.essor.ml/fonds-climat-mali-mme-keita-aida-mbo-salue-les-contributions-des-partenaires-suedois-et-norvegiens/'
+    # url = 'https://www.essor.ml/chantiers-de-construction-de-batiments-il-ny-a-pas-que-les-mauvais-exemples/'
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    #req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    #html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    #get title
+    article_box = soup.find('div', attrs={'class':'entry-content clearfix'})
+    hold_dict['title'] = soup.find('h1', attrs={'class':'entry-title'}).text.strip()
+
+    #get the authors. not all articles have authors
+    hold_dict['author'] = [x for x in soup.find('a', attrs={'itemprop':'author'})]
+
+    #get the date. format dayofweek dd month yyyy
+    hold_dict['date'] = soup.find('time',attrs={'class':re.compile('entry-date')}).text.strip()
+
+    #get section(s)
+    hold_dict['section'] = [x.text.strip() for x in soup.find_all('div', attrs={'class':'vbreadcrumb'})]
+
+    #get the text.
+    hold_dict['text'] = [p.text.strip() for p in article_box.find_all('p')]
+
+    #get the article first paragraph
+    hold_dict['abstract'] = [p.text.strip() for p in article_box.find_all('p')][0]
+
+    #no reported location for this publication.
+
+    #get the images
+    hold_dict['image_urls'] = [x['src'] for x in article_box.find_all('img', attrs={'class':re.compile('wp-image')})]
+
+    #get the captions
+    hold_dict['image_captions'] = [x.text.strip() for x in article_box.find_all('figure', attrs={'class':'wp-block-image'})]
+
+    return hold_dict
+
 
 
