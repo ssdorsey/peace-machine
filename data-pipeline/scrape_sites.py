@@ -697,10 +697,6 @@ def maliweb_story(url):
     """
     collecting story data for maliweb.
     note: this website is in French.
-    Note: this function is kicking out after I define 'soup', and isn't
-    saving the rest of the function. It all works for maliweb, I just don't
-    know why the rest of the function isn't being perceived as part of
-    the maliweb_story function.
     """
 
     #url = 'https://www.maliweb.net/politique/corruption/corruption-au-mali-traquer-lhydre-2799525.html'
