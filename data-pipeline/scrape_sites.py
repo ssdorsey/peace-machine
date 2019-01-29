@@ -817,3 +817,54 @@ def nation_story(html):
     hold_dict['image_captions'] = [x.text.strip() for x in soup.find_all('p', attrs={'id':'photo_article_caption'})]
 
     return hold_dict
+
+
+def theeastafrican_story(html):
+    """
+    collecting story data for theeastafrican.
+    the sitemap seems to be out of date here, but allegedly resides at the
+    following link: https://www.theeastafrican.co.ke/sitemap/sitemap-index.xml
+    """
+
+    #url = 'https://www.theeastafrican.co.ke/news/ea/3-suspected-Ugandans-held-over-terrorism-Mozambique/4552908-4957298-jar2fez/index.html'
+    #url = 'https://www.theeastafrican.co.ke/business/Kenyans-protest-Tanzania-unfair-trade-practices/2560-4956968-tdboud/index.html'
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    # req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    # html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    article_box = soup.find('article', attrs={'class':'article'})
+
+    #get title
+    hold_dict['title'] = soup.find('h2').text.strip()
+
+    #get the authors. not all articles have authors
+    author_box = article_box.find('section', attrs={'class':'author noprint'})
+    hold_dict['author'] = [x.text.strip() for x in author_box.find_all('strong')]
+    #last strong item in main content is the author.
+
+    #get the date. format dd.mmm.yyyy
+    hold_dict['date'] = soup.find('h6',).text.strip()
+
+    #get section(s)
+    hold_dict['section'] = [x.text.strip().split('\n')[-1] for x in soup.find_all('ol', attrs={'class':'breadcrumb'})]
+
+    #get the text.
+    hold_dict['text'] = [p.text.strip() for p in article_box.find_all('p')]
+
+    #get the article first paragraph
+    abstract_box = article_box.find('section',attrs={'class':'summary'})
+    hold_dict['abstract'] = [p.text.strip() for p in abstract_box.find_all('li')]
+
+    #no reported location for this publication.
+
+    #get the images
+    hold_dict['image_urls'] = [x['src'] for x in soup.find_all('img', attrs={'class':'photo_article'})]
+
+    #get the captions
+    hold_dict['image_captions'] = [x.text.strip() for x in soup.find_all('p', attrs={'id':'photo_article_caption'})]
+
+    return hold_dict
