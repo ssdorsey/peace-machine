@@ -625,10 +625,10 @@ def dw_story(html):
 def france24_story(html):
 	"""
 	collecting story data for france 24. 
-	can't figure out a good way to get images or captions to work for this one.
-	"""
+	can't figure out a good way to get images or captions to work for this one. Someone please look at the images/captions.
+	#url = 'https://www.france24.com/en/20190123-yellow-vests-french-riot-police-now-wear-body-cameras'
 
-	url = 'https://www.france24.com/en/20190123-yellow-vests-french-riot-police-now-wear-body-cameras'
+	"""
 
 	#create a dictionary to hold everything in
 	hold_dict = {}
@@ -641,9 +641,7 @@ def france24_story(html):
 	hold_dict['title'] = soup.find('h1', attrs={'class':re.compile('t-content__title')}).text.strip()
 
 	#get the authors. not all articles have authors, especially wire reports.
-	#soup.find_all('span',attrs={'class':'m-from-author__name'})
 	hold_dict['author'] = str(set([x.text.strip() for x in soup.find_all('span',attrs={'class':'m-from-author__name'})]))
-	# if re.match(r'Author\s+', x.text.strip())]))
 
 	#get the date. format dd.mm.yyyy
 	date_box = [x.text.strip() for x in soup.find_all('span',attrs={'class':'m-pub-dates__date'})]
@@ -681,10 +679,11 @@ def essor_story(html):
     collecting story data for essor.
     note: this website is in French.
     does not seem to have a sitemap, empty robots.txt file.
+    
+    # url = 'https://www.essor.ml/fonds-climat-mali-mme-keita-aida-mbo-salue-les-contributions-des-partenaires-suedois-et-norvegiens/'
+    # url = 'https://www.essor.ml/chantiers-de-construction-de-batiments-il-ny-a-pas-que-les-mauvais-exemples/'    
     """
 
-    # url = 'https://www.essor.ml/fonds-climat-mali-mme-keita-aida-mbo-salue-les-contributions-des-partenaires-suedois-et-norvegiens/'
-    # url = 'https://www.essor.ml/chantiers-de-construction-de-batiments-il-ny-a-pas-que-les-mauvais-exemples/'
 
     #create a dictionary to hold everything in
     hold_dict = {}
@@ -726,10 +725,11 @@ def maliweb_story(html):
     """
     collecting story data for maliweb.
     note: this website is in French.
-    """
-
+    
     #url = 'https://www.maliweb.net/politique/corruption/corruption-au-mali-traquer-lhydre-2799525.html'
     #url = 'https://www.maliweb.net/politique/revision-constitutionnelle-les-signaux-dune-nouvelle-tentative-vouee-a-lechec-2799490.html'
+    """
+
 
     #create a dictionary to hold everything in
     hold_dict = {}
@@ -772,10 +772,12 @@ def maliweb_story(html):
 def nation_story(html):
     """
     collecting story data for nation.
-    """
 
     #url = 'https://www.nation.net/politique/corruption/corruption-au-mali-traquer-lhydre-2799525.html'
     #url = 'https://www.nation.net/politique/revision-constitutionnelle-les-signaux-dune-nouvelle-tentative-vouee-a-lechec-2799490.html'
+
+    """
+
 
     #create a dictionary to hold everything in
     hold_dict = {}
@@ -824,10 +826,10 @@ def theeastafrican_story(html):
     collecting story data for theeastafrican.
     the sitemap seems to be out of date here, but allegedly resides at the
     following link: https://www.theeastafrican.co.ke/sitemap/sitemap-index.xml
-    """
 
     #url = 'https://www.theeastafrican.co.ke/news/ea/3-suspected-Ugandans-held-over-terrorism-Mozambique/4552908-4957298-jar2fez/index.html'
     #url = 'https://www.theeastafrican.co.ke/business/Kenyans-protest-Tanzania-unfair-trade-practices/2560-4956968-tdboud/index.html'
+    """
 
     #create a dictionary to hold everything in
     hold_dict = {}
