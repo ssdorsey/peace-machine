@@ -189,6 +189,35 @@ def collect_dw():
         with open('links/dw.txt', 'a') as f:
             for url in links:
                 f.write(url + '\n')
+		
+
+def maliweb_gen(year, month):
+    """
+    the sitemap is written in a random format. I don't know how to write a
+    systematic generation and collection function for these sitemaps.
+    """
+    for index in range(0,195):
+        print(index)
+    return f'https://www.maliweb.net/post-sitemap{index}.xml'
+'
+	#this sitemap only contains daily. but I can't figure out
+
+
+def collect_maliweb():
+    """
+    the sitemaps are split up at random date intervals. I don't know how to
+    write systematic generation and collection functions for these sitemaps.
+    """
+    # all the years we want from the NYT
+    maliweb_sitemaps = [maliweb_gen(year, month) for year in years for month in months]
+    # loop through every sitemap and get the links
+    for sm in tqdm(maliweb_sitemaps): # tqdm just gives us an easy progress tracker
+        links = read_sitemap(sm)
+        # save the links to a text file
+        with open('links/maliweb.txt', 'a') as f:
+            for url in links:
+                f.write(url + '\n')
+
 
 
 # ------------------------------------------------------------------------------
@@ -664,5 +693,54 @@ def essor_story(url):
 
     return hold_dict
 
+def maliweb_story(url):
+    """
+    collecting story data for maliweb.
+    note: this website is in French.
+    Note: this function is kicking out after I define 'soup', and isn't
+    saving the rest of the function. It all works for maliweb, I just don't
+    know why the rest of the function isn't being perceived as part of
+    the maliweb_story function.
+    """
 
+    #url = 'https://www.maliweb.net/politique/corruption/corruption-au-mali-traquer-lhydre-2799525.html'
+    #url = 'https://www.maliweb.net/politique/revision-constitutionnelle-les-signaux-dune-nouvelle-tentative-vouee-a-lechec-2799490.html'
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    article_box = soup.find('div', attrs={'class':'td-post-content'})
+
+    #get title
+    hold_dict['title'] = soup.find('h1', attrs={'class':'entry-title'}).text.strip()
+
+    #get the authors. not all articles have authors
+    hold_dict['author'] = [x.parent.text.strip() for x in article_box.find_all('strong')][-1]
+    #last strong item in main content is the author.
+
+    #get the date. format dd.mmm.yyyy
+    hold_dict['date'] = soup.find('time',attrs={'class':re.compile('entry-date')}).text.strip()
+
+    #get section(s)
+    hold_dict['section'] = [x.text.strip() for x in soup.find('ul', attrs={'class':'td-category'})]
+
+    #get the text.
+    hold_dict['text'] = [p.text.strip() for p in article_box.find_all('p')]
+
+    #get the article first paragraph
+    hold_dict['abstract'] = [p.text.strip() for p in article_box.find_all('p')][0]
+
+    #no reported location for this publication.
+
+    #get the images
+    hold_dict['image_urls'] = [x['href'] for x in article_box.find_all('a', attrs={'href':re.compile('https://')})]
+
+    #get the captions
+    hold_dict['image_captions'] = [x['data-caption'] for x in article_box.find_all('a', attrs={'href':re.compile('https://')})]
+
+    return hold_dict
 
