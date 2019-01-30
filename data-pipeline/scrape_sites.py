@@ -617,7 +617,7 @@ def france24_story(url):
 	# hold_dict['image_captions'] = [str(x).split('" ')[0] for x in rest3]
 
 	return hold_dict
-
+###########################################################################
 def businessnews_story(html):
     '''
     This website does not use images. Occasionally, you can see them at the bottom of the text,
@@ -659,3 +659,67 @@ def businessnews_story(html):
     hold_dict['image_urls'] = [""]
     # return
     return hold_dict
+
+    ##############################################################
+
+    def thecitizen_story(html):
+        '''
+        The code below rarely misses author information if the author information does not follow by @ (see the code below).
+        It captured everytime I tried except once where the author's name did not follow by @.
+        I just saw it once and it was in entertainment section. All the news in the news section has author
+        format like this: "by xxx @xxx". When it is in this format (almost 99%), it works fine. Hence, it is not a big deal.
+        Some news pieces had no author or image, that's why I used try and except structure in order not to get error.
+        News text start with location information, most of the time Dar es Salaam but it changes especially in international news. I also get
+        rid of "related to: [link]" paragraphs which are at the end of the text. I wrote the code in a way that gets rid of any paragraph that
+        starts with "related to:". If there is a better way, let me know (like getting rid of any paragraph that contains link etc.)
+        url= "https://www.thecitizen.co.tz/News/Study--More-civic-space-required-for-Tanzanians-to-enjoy/1840340-4951430-xtyu6u/index.html"
+        '''
+        # create a dictionary to hold everything in
+        hold_dict = {}
+        # first turn the html into BeautifulSoup
+        soup = BeautifulSoup(html, "lxml")
+        # pull the data I want
+        # title
+        hold_dict['title'] = soup.find("h2").text
+
+        # date Day of the week/Month/Day of the month/Year
+        date = soup.find("h6").text
+        hold_dict['date'] = date
+
+        #Author: The author information has the following pattern: "By Serkant @Serkant's Twitter".
+        try:
+            author = soup.find('section', {'class':'author'}).text
+            author = re.search('By(.*) @', author)
+            hold_dict['author'] = author.group(1)
+        except AttributeError:
+            hold_dict['author'] = [""]
+
+        # Section: News seems to be the major category and the rest is entertainment, magazines etc.
+        section = soup.find('ol', {"class": "breadcrumb"}).text
+        section_info = section.split()
+        hold_dict['section'] = section_info[-1]
+
+        # text
+        body = soup.find('section', {'class':'body-copy'})
+        text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
+        # removing \xa0 s which are at the end mostly.
+        text = [ii.replace("\xa0", "") for ii in text]
+        # Getting rid of related to news which are at the end.
+        text = [item for item in text if not (item.startswith('Related to:'))]
+        hold_dict['text'] = text
+
+        # images
+        try:
+            images = soup.find('img', {'class':'photo_article'})["src"]
+            link = "thecitizen.co.tz"
+            hold_dict['image_urls']= link + images
+        except TypeError:
+            hold_dict['image_urls'] = [""]
+
+        # image captions
+        try:
+            hold_dict['image_captions'] = soup.find('p', {'id':'photo_article_caption'}).text
+        except AttributeError:
+            hold_dict['image_captions'] = [""]
+        # return
+        return hold_dict
