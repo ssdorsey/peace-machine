@@ -869,4 +869,66 @@ def theeastafrican_story(html):
     #get the captions
     hold_dict['image_captions'] = [x.text.strip() for x in soup.find_all('p', attrs={'id':'photo_article_caption'})]
 
+
+def Bloomberg_story(html):
+
+    """
+    get the story data for bloomberg stories
+
+    note: i haven't tested this function because bloomberg is preventing me
+    from downloading the html code. consequently, I can look at the code from
+    the website and write a scraper based on what I think it should be, but
+    I can't verify that the function works.
+
+    url = 'https://www.bloomberg.com/news/articles/2019-01-18/trump-to-hold-second-summit-with-north-korea-s-kim-in-february?srnd=premium'
+    url = 'https://www.bloomberg.com/news/articles/2019-01-30/boeing-cracks-100-billion-sales-mark-sees-new-gains-in-2019?srnd=premium'
+    """
+
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    # request =  urllib.request.urlopen(urllib.request.Request(url, headers={
+    #         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    #         'accept-encoding': 'gzip, deflate, br',
+    #         'accept-language': 'en-US,en;q=0.9,fr;q=0.8,ro;q=0.7,ru;q=0.6,la;q=0.5,pt;q=0.4,de;q=0.3',
+    #         'cache-control': 'max-age=0',
+    #         'upgrade-insecure-requests': '1',
+    #         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'}))
+
+    # gzipfile = gzip.GzipFile(fileobj=request)
+    # html = gzipfile.read()
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    #get title
+    hold_dict['title'] = soup.find('h1', attrs={'class':'lede-text-v2__hed'}).text.strip()
+
+    #get the authors. not all articles have authors, especially wire reports.
+    hold_dict['authors'] = list(set([a.text.strip() for a in soup.find_all('a', attrs={'class':'author-v2__byline'})]))
+
+    #get the date.
+    hold_dict['date'] = soup.find('time', attrs={'class':'article-timestamp'}).text.strip()
+
+    #get section
+    hold_dict['section'] = soup.find('div', attrs={'class':'eyebrow-v2'}).text.strip()
+
+    #get the text.
+    text_box = soup.find('div', attrs={'class':'body-copy-v2 fence-body'})
+    hold_dict['text'] = [p.text.strip() for p in text_box]
+
+    #get the article first paragraph
+    abstract_box = soup.find('ul', attrs={'class':'abstract_v2'})
+    hold_dict['abstract'] = [x.child.text.strip() for x in abstract_box]
+
+    #no reported location for this publication.
+
+    #get the images
+    image_box = soup.find_all('div',attrs={'class':'lede-large-image-v2__image'})
+    hold_dict['image_urls'] = [i['style'] for i in image_box]
+
+    #get the captions
+    caption_box = soup.find_all('div', attrs={'class':'news-figure-caption-text caption'})
+    hold_dict['image_captions'] = [caption.text.strip() for caption in caption_box]
+
+    return hold_dict
     return hold_dict
