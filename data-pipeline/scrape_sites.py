@@ -723,3 +723,47 @@ def businessnews_story(html):
             hold_dict['image_captions'] = [""]
         # return
         return hold_dict
+
+    ##################################################
+def mtanzania_story(html):
+    '''
+    The problem here is that the author section is just the name of the newspaper. It always says: "By Mtanzania Digital". Yet,
+    the authors write their names at the beginning of the text. It is the first paragraph in the text. However, the authors sometimes
+    add their locations as well so I could not choose the first paragraph as author information since, from time to time, it will also capture
+    location information. More importantly, sometimes they do not write their names, so the first paragraph will be actual text.
+    url= "https://mtanzania.co.tz/muswada-vyama-vya-siasa-kiboko/"
+    url= "https://mtanzania.co.tz/majeruhi-yaitesa-tottenham/"
+    '''
+    hold_dict = {}
+    soup = BeautifulSoup(html, "lxml")
+
+    # title
+    hold_dict['title'] = soup.find('h1', {'class':'entry-title'}).text
+
+    # date. Month/Day/Year
+    date = soup.find('span', {'class':'td-post-date'}).text
+    hold_dict['date'] = date
+
+    #author. This is useless since it just says "Mtanzania Digital"
+    author = soup.find('div', {'class':'td-post-author-name'}).text
+    author = re.search('By(.*) -', author)
+    hold_dict['author'] = author.group(1)
+
+    # section
+    section = soup.find('li', {"class": "entry-category"}).text
+    hold_dict['section'] = section
+
+    # text
+    body = soup.find('div', {'class':'td-post-content'})
+    text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
+    # removing \n s which are at the end mostly.
+    text = [ii.replace("\n", " ") for ii in text]
+    text = [ii.replace("\xa0", " ") for ii in text]
+    hold_dict['text'] = text
+
+    # images.
+    images = soup.find('div', {'class':"td-post-featured-image"})
+    images = [i.find('img')['src'] for i in images]
+    hold_dict['image_urls'] = images
+    # return
+    return hold_dict
