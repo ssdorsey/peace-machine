@@ -622,7 +622,7 @@ def businessnews_story(html):
     '''
     This website does not use images. Occasionally, you can see them at the bottom of the text,
     but they are added as additional paragraphs and they do not have separate tags to identify them.
-    There is also no author information. Note that I assign these two (image and author) as null below.
+    There is also no author information. Note that I assign these two (image and author) as empty strings below.
     url = 'http://businessnews.com.ng/2011/03/21/nexim-to-join-commonwealth-lawyers-association-to-promote-trade/'
     url = 'http://businessnews.com.ng/2017/10/19/reps-ask-npa-to-reverse-termination-of-agreement-with-intels/'
     '''
@@ -637,7 +637,7 @@ def businessnews_story(html):
     hold_dict['date'] = date.split("on")[-1]
 
     #author
-    hold_dict["author"]=[]
+    hold_dict["author"]=[""]
 
     # section
     section = soup.find('div', {"id": "crumbs"}).text
@@ -656,6 +656,6 @@ def businessnews_story(html):
     hold_dict['text'] = text
 
     # images (in order): this website does not use images. Rarely, they use them but they are included as paragraph items and they do not have separate tags.
-    hold_dict['image_urls'] = []
+    hold_dict['image_urls'] = [""]
     # return
     return hold_dict
