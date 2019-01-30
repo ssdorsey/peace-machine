@@ -922,3 +922,50 @@ def Bloomberg_story(html):
 
     return hold_dict
 
+
+def ksnmedia_story(html):
+    """
+    collecting story data for ksnmedia. the robots.txt file is empty and the
+    website does not appear to have a sitemap, although you do have to
+    press shift while right-clicking to inspect webpage elements. 
+
+    url = 'https://ksnmedia.com/2019/01/kenya-asks-un-to-finance-somalia-war-against-shabaab/'
+    url = 'https://ksnmedia.com/2019/01/model-responds-to-claims-she-was-busted-with-married-man-in-zanzibar/'
+    url = 'https://ksnmedia.com/2019/01/questions-as-kenyas-uhuru-kenyatta-the-only-head-of-state-to-attend-tshisekedi-swearing-in/'
+    """
+    #create a dictionary to hold everything in
+    hold_dict = {}
+
+    #req = urllib.request.Request(url,data=None,headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'})
+    #html = urllib.request.urlopen(req).read()
+    soup = BeautifulSoup(html, 'lxml')
+
+    article_box = soup.find('div', attrs={'id':'mvp-content-main'})
+
+    #get title
+    hold_dict['title'] = soup.find('h1').text.strip()
+
+    #get the authors. not all articles have authors
+    hold_dict['author'] = [x.text.strip() for x in soup.find('span', attrs={'class':re.compile('author-name')}).find_all('a')]
+
+    #get the date. format dd.mmm.yyyy
+    hold_dict['date'] = soup.find('span',attrs={'class':'mvp-post-date updated'}).text.strip()
+
+    #get section(s)
+    hold_dict['section'] = list(set([x.text.strip() for x in soup.find_all('span', attrs={'class':'mvp-post-cat left'})]))
+
+    #get the text.
+    hold_dict['text'] = [p.text.strip() for p in article_box.find_all('p')]
+
+    #get the article first paragraph
+    hold_dict['abstract'] = [p.text.strip() for p in article_box.find_all('p')][0]
+
+    #no reported location for this publication.
+
+    #get the images
+    hold_dict['image_urls'] = [x.parent.find('article').find('img')['src'] for x in article_box.find_all('figcaption')] + [x.find('img')['src'] for x in soup.find_all('div',attrs={'id':'mvp-post-feat-img'})] + [x['src'] for x in article_box.find_all('img',attrs={'class':re.compile('size-full')})]
+
+    #get the captions
+    hold_dict['image_captions'] = [x.text.strip() for x in article_box.find_all('figcaption')] + [x.text.strip() for x in article_box.find_all('p', attrs={'class':'wp-caption-text'})]
+
+    return hold_dict
