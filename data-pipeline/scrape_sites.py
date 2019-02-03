@@ -814,3 +814,71 @@ def ippmedia_story(html):
     # return
 
     return hold_dict
+
+    ################################
+
+    def amnesty_story(html):
+        '''
+        It does not have author information. There is no image caption either.
+        Since this is not a newspaper website, the only relevant part is the news section. I tried the code in the news
+        section and it works (with some problems).
+        That's why, the section information in this code gives additional sub-sections like region and type of event.
+        See the following url and the section information just under the image.
+        There are 3 types of news in terms of images. Those with the credit information (photographer etc.),
+        those without the credit information and those with no image (old news).
+        The code below handles types with credit and without credit info, but THROWS an ERROR when there is no image. I tried
+        "one try and two except" structure but it failed since the except conditions are the same.
+        The first url example below has the image with the credit information, the second url does not have. The third has no image.
+        Lastly, the code gets the urls for images and I can see images when I try them in the web browser. But, it redirects to another link all the time.
+        It downloads from somewhere else. I do not know whether this will be an issue or not.
+        url = "https://www.amnesty.org/en/latest/news/2019/02/nigeria-deadliest-boko-haram-attack-on-rann-leaves-at-least-60-people-murdered/"
+        url2= "https://www.amnesty.org/en/latest/news/2019/02/saudi-arabia-authorities-must-drop-calls-to-execute-peaceful-protesters/"
+        url3 = "https://www.amnesty.org/en/latest/news/2008/01/farc-releases-two-high-profile-hostages-20080110/"
+        '''
+        # create a dictionary to hold everything in
+        hold_dict = {}
+        # first turn the html into BeautifulSoup
+        soup = BeautifulSoup(html, "lxml")
+
+        # title
+        hold_dict['title'] = soup.find("h1", {"class": "heading--main heading--in-padded"}).text.strip()
+        # date Day/Month/Year, Hour/Minutes format
+        hold_dict['date'] = soup.find("div", {"class": "meta__section "}).text
+
+
+        #Author
+        hold_dict['author'] = [""]
+
+        # Section.
+        hold_dict['section'] = soup.find('div', {"class": "col col--5/6--md"}).text
+
+        # text
+        body = soup.find('div', {'class':'wysiwyg'})
+        text = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
+        # removing \xa0 s which are at the end mostly.
+        text = [ii.replace("\xa0", "") for ii in text]
+        hold_dict['text'] = text
+
+        # images. There are two types and no image type
+        try:
+            images = soup.find('div', {'class':'image-header print-hidden'})
+            images_url = [i.find('img') for i in images][3]
+            photo_link = images_url['src']
+            amnesty_link = "www.amnesty.org"
+            image_link = amnesty_link + photo_link
+            hold_dict['image_urls'] = image_link
+        except TypeError:
+            images = soup.find('div', {'class':'image-header image-header--has-credits-sm print-hidden'})
+            images_url = [i.find('img') for i in images][3]
+            photo_link = images_url['src']
+            amnesty_link = "www.amnesty.org"
+            image_link = amnesty_link + photo_link
+            hold_dict['image_urls'] = image_link
+        #except TypeError:
+            #hold_dict['image_urls'] = [""]
+
+        # image captions
+        hold_dict['image_captions'] = [""]
+
+        # return
+        return hold_dict
