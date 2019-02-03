@@ -767,3 +767,50 @@ def mtanzania_story(html):
     hold_dict['image_urls'] = images
     # return
     return hold_dict
+    ###################################
+
+def ippmedia_story(html):
+    '''
+    Everything seems to be working.
+    url="https://www.ippmedia.com/en/news/orci-extends-screening-coverage-cancers"
+    '''
+    # create a dictionary to hold everything in
+    hold_dict = {}
+    # first turn the html into BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+
+    # title
+    hold_dict['title'] = soup.find("div", {"class": "nodetitle"}).text
+
+    # date Day/Month/Year format
+    hold_dict['date'] = soup.find("div", {"class": "ndate"}).text
+
+    #Author: Sometimes, it just gives "The Guardian reporter."
+    hold_dict['author'] = soup.find('div', {'class':'nreporter'}).text
+
+    # Section
+    hold_dict['section'] = soup.find('div', {"class": "nsection"}).text
+
+    # text
+    hold_dict['text'] = soup.find('div', {'class':'field-items'}).text
+
+
+    # images. Using try-except since there can be news with no images.
+    try:
+        images = soup.find('div', {'class':'views-field views-field-nothing-2 ndicwrap'})
+        images_url = [i.find('img') for i in images][1]
+        images_url = images_url['src']
+        hold_dict['image_urls'] = images_url
+    except TypeError:
+        hold_dict['image_urls'] = [""]
+
+    # image captions
+    try:
+        caption = [i.find('blockquote') for i in images][1].text
+        hold_dict['image_captions'] = caption
+    except AttributeError:
+        hold_dict['image_captions'] = [""]
+
+    # return
+
+    return hold_dict
