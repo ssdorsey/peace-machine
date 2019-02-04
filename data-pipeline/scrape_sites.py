@@ -196,7 +196,6 @@ def reuters_story(html):
     # return
     return hold_dict
 
-    return hold_dict
 
 def star_story(html):
     '''
@@ -217,7 +216,6 @@ def star_story(html):
               image in image_containers]
     hold_dict['srcs'] = [img['src'] for img in soup.find_all('img')]
     hold_dict['alts'] = [img['alt'] for img in soup.find_all('img')]
-
     return hold_dict
 
 
@@ -239,13 +237,18 @@ def nan_story(html):
     else:
         hold_dict['authors'] = ['']
     if firstline.startswith('By'):
-        hold_dict['text'] = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')][1:]
+        hold_dict['text'] = [p.text.encode('ascii', 'ignore').decode() for p in body.find_all('p') if not p.has_attr('class')][1:]
     else:
-        hold_dict['text'] = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')][0:]
+        hold_dict['text'] = [p.text.encode('ascii', 'ignore').decode() for p in body.find_all('p') if not p.has_attr('class')][0:]
     if body.find_all('img'):
          images=[img['src'] for img in body.find_all('img')]
-    hold_dict['caption'] = soup.find_all('figcaption', {'class':'wp-caption-text'})
+    caption = soup.find_all('figcaption', {'class':'wp-caption-text'})
+    if caption:
+        hold_dict['caption'] = [c.text for c in caption]
+    else:
+        hold_dict['caption'] = []
     return hold_dict
+
 
 
 def thenews_story(html):
@@ -265,14 +268,15 @@ def thenews_story(html):
     if hold_dict['text'][-1].startswith('('):
         hold_dict['authors'] = hold_dict['text'][-1]
     else:
-        hold_dict['authors']=[""]
+        hold_dict['authors']=[]
     if body.find_all('img'):
          hold_dict['images'] = [img['src'] for img in body.find_all('img')]
     if soup.find('p', {'class': re.compile(r'caption')}):
         hold_dict['caption'] = soup.find('p', {'class': re.compile(r'caption')}).text
     else:
-        hold_dict['caption'] = ['']
+        hold_dict['caption'] = []
     return hold_dict
+
 
 def ndn_story(html):
     """
@@ -291,14 +295,17 @@ def ndn_story(html):
     picture=soup.find('div',{'class':'td-post-featured-image'})
     if soup.find('div', {'class':'td-post-featured-image'}):
         hold_dict['images'] = [img['src'] for img in picture.find_all('img')]
-    body=soup.find('div',{'class':'td-post-content'})
-    paragraphs=[paragraph.text.strip() for paragraph in body.find_all('p')]
-    if paragraphs==[]:
-        text=[paragraph.text.strip() for paragraph in body.find_all('span')]
-        hold_dict['text']=list(filter(None, text))
-    else:
-        hold_dict['text']=body_p=list(filter(None, paragraphs))
+    body=soup.find('div',{'class':'td-post-content'}).find_all('p')
+    pars = [p.text.strip() for p in body]
+    pars = [p.split('\n') for p in pars]
+    pars = [i for list in body for i in list]
+    if len(pars) > 0:
+        if re.match(r'(by|from)', pars[0].text, re.I): 
+            string = re.match(r'(by|from)', pars[0].text, re.I)
+            hold_dict['authors'] = pars[0].text[string.span()[1]+1:] 
+    hold_dict['text'] = [p.replace('\n', '') for p in pars if type(p) is bs4.element.NavigableString]
     return hold_dict
+
 
 
 def tdn_story(html):
@@ -321,14 +328,12 @@ def tdn_story(html):
         hold_dict['images'] = [''.join(src[0:])]
     else:
         hold_dict['images'] = []
-    # Caption
     hold_dict['caption'] = soup.find('figcaption',{'class':'attribution'}).text.strip().split('FILE PHOTO')[0]
-    # Text
     body = soup.find('article',{'class':'article-story page-box'})
     hold_dict['text'] = [paragraph.text.strip() for paragraph in body.find_all('p')]
-    # section
     hold_dict['section'] = [caption.text.strip() for caption in body.find_all('h5')][0]
     return hold_dict
+
 
 
 def cit_story(html):
@@ -356,6 +361,8 @@ def cit_story(html):
     return(hold_dict)
 
 
+
+
 def bt_story(html):
     """
     I have an issue with the text, I wasn't able to take out some of the links in the paragraph because they are imbedded in paragraphs
@@ -376,13 +383,12 @@ def bt_story(html):
     if captions:
          hold_dict['caption'] = [c.text.strip() for c in captions]
     else:
-        hold_dict['caption'] = ['']
+        hold_dict['caption'] = []
     body = soup.find('div', {'class':'entry-content clearfix single-post-content'})
-    # pars = [paragraph.text.encode('ascii', 'ignore').decode() for paragraph in body if not paragraph.has_attr('a')]
-    # hold_dict['text'] = pars
+    pars = [p.text.replace('\n','') for p in body.find_all('p') if not p.find('a')]
+    hold_dict['text'] = pars
     hold_dict['section'] = soup.find('div',{'class':'term-badges floated'}).text.strip()
     return hold_dict
-
 
 
 def devex_story(html):
@@ -411,6 +417,7 @@ def devex_story(html):
     categories = soup.find('ul', {'class':'categories'})
     hold_dict['section'] =[sec.text for sec in categories.find_all('li')]
     return hold_dict
+
 
 
 def standard_story(html):
@@ -446,6 +453,7 @@ def standard_story(html):
     return hold_dict
 
 
+
 def nwn_story(html):
     """
     There is no caption for the pictures
@@ -475,6 +483,8 @@ def nwn_story(html):
     return hold_dict
 
 
+
+
 def dnt_story(html):
     """
     There is no caption for the pictures or section
@@ -502,6 +512,7 @@ def dnt_story(html):
     pars = [p.strip().encode('ascii', 'ignore').decode() for p in text if type(p) is bs4.element.NavigableString]
     hold_dict['text'] = list(filter(None, pars))
     return hold_dict
+
 
 
 def fh_story(html):
