@@ -8,6 +8,8 @@ from time import sleep # for pausing the script so we don't overload servers
 from tqdm import tqdm # useful little package for creating progress bars
 from datetime import datetime, timedelta, date # for managing date formats
 import re
+import bs4
+import numpy as np
 
 
 # ------------------------------------------------------------------------------
@@ -194,178 +196,101 @@ def reuters_story(html):
     # return
     return hold_dict
 
-
-def star_story(html):
-    hold_dict={}
-    soup=BeautifulSoup(html, 'lxml')
-    header=header=soup2.find('div', {'class':'l-region l-region--title'})
-    #title
-    hold_dict['title']=header.find('div', {'class':'pane-content'}).text.strip()
-    # Authors
-    header_auth=soup.find('div', {'class':'panel-pane pane-entity-field pane-node-field-converge-byline'})
-    hold_dict['authors']=header_auth.find('div', {'class':'field__item even'}).text[3:].split(' and ')
-    #Date
-    hold_dict['date']=header.find('div', {'class':'field__item even'}).text
-    #section
-    hold_dict['section']=header_section.find('a',{'href':'/sections/national-news_c29654'}).text
-    #text
-    body=soup.find('div', {'class':'field field-name-body'})
-    hold_dict['text']= [paragraph.text for paragraph in body.find_all('p')]
-    #image and caption - couldn't separate them or define only for the images we care about
-    #1. Retriving a string not sure how to separate it for every case
-    image_containers = soup.find_all('div', {'class':'panel-pane pane-page-content'})
-    hold_dict['image']= [image.find('div', {'class':re.compile('field__item even')}) for
-              image in image_containers]
-    #2. Retrieving the information of all images not only the one in the text
-    hold_dict['srcs'] = [img['src'] for img in soup2.find_all('img')]
-    hold_dict['alts'] = [img['alt'] for img in soup2.find_all('img')]
-
     return hold_dict
 
-############################## Star MEDIA
 def star_story(html):
+    '''
+    url = 'https://www.the-star.co.ke/news/2018/12/14/knut-rejects-uhurus-big-4-housing-levy_c1865754'
+    '''
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
     header=soup.find('div', {'class':'l-region l-region--title'})
-    #title
     hold_dict['title']=header.find('div', {'class':'pane-content'}).text.strip()
-    # Authors
     header_auth=soup.find('div', {'class':'panel-pane pane-entity-field pane-node-field-converge-byline'})
     hold_dict['authors']=header_auth.find('div', {'class':'field__item even'}).text[3:].split(' and ')
-    #Date
     hold_dict['date']=header.find('div', {'class':'field__item even'}).text
-    #section
     hold_dict['section']=header_section.find('a',{'href':'/sections/national-news_c29654'}).text
-    #text
     body=soup.find('div', {'class':'field field-name-body'})
     hold_dict['text']= [paragraph.text for paragraph in body.find_all('p')]
-    #image and caption - couldn't separate them or define only for the images we care about
-    #1. Retriving a string not sure how to separate it for every case
     image_containers = soup.find_all('div', {'class':'panel-pane pane-page-content'})
     hold_dict['image']= [image.find('div', {'class':re.compile('field__item even')}) for
               image in image_containers]
-    #2. Retrieving the information of all images not only the one in the text
-    hold_dict['srcs'] = [img['src'] for img in soup2.find_all('img')]
-    hold_dict['alts'] = [img['alt'] for img in soup2.find_all('img')]
+    hold_dict['srcs'] = [img['src'] for img in soup.find_all('img')]
+    hold_dict['alts'] = [img['alt'] for img in soup.find_all('img')]
 
     return hold_dict
 
-### Checking the function works###
-url = 'https://www.the-star.co.ke/news/2018/12/14/knut-rejects-uhurus-big-4-housing-levy_c1865754'
-req = urllib.request.Request(
-   url,
-   data=None,
-   headers={
-       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0'
-   }
-)
-standard_html = urllib.request.urlopen(req).read()
-star = star_story(standard_html)
 
-
-
-############################## NEWS AGENCY OF NIGERIA
 def nan_story(html):
     """
     There is no information for the sitemap when using https://www.nan.ng/robots.txt
     Caption info is messy
+    url_1 = 'https://www.nan.ng/news/jonathan-visited-buhari/'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
     header=soup.find('div', {'class':'article-header none'})
-    #title
     hold_dict['title'] = header.find('h1', {'class':' xt-post-title'}).text.strip()
-    #Date
     hold_dict['date'] = soup.find('time', {'class':' xt-post-date'})['datetime'].split('T')[0]
-    #Authors
     body=soup.find('div',{'class':'article-content'})
     firstline = body.find('p').text
     if firstline.startswith('By'):
         hold_dict['authors'] = body.find('p').getText().split('By')[1].split('/')
     else:
         hold_dict['authors'] = ['']
-    #text
     if firstline.startswith('By'):
         hold_dict['text'] = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')][1:]
     else:
         hold_dict['text'] = [paragraph.text for paragraph in body.find_all('p') if not paragraph.has_attr('class')][0:]
-    #images
     if body.find_all('img'):
          images=[img['src'] for img in body.find_all('img')]
-    #caption
     hold_dict['caption'] = soup.find_all('figcaption', {'class':'wp-caption-text'})
     return hold_dict
 
-#Testing
-url_1 = 'https://www.nan.ng/news/jonathan-visited-buhari/'
-nan_html = urllib.request.urlopen(url_1)
-nan = nan_story(nan_html)
 
-
-############################## THE NEWS
-#There is no information for the sitemap when using https://www.thenewsnigeria.com.ng/robots.txt
 def thenews_story(html):
     """
     There is no information for the sitemap when using https://www.nan.ng/robots.txt
+    url = 'https://www.thenewsnigeria.com.ng/2019/01/i-can-vouch-for-atiku-says-obasanjo/'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
     header=soup.find('div', {'id':'content'})
-    #title
     hold_dict['title']=header.find('h1', {'class':'entry-title single-entry-title'}).text.strip()
-    #Date
     hold_dict['date']=header.find('div', {'class':'info'}).text.strip().split(" -")[0]
-    #Section
     news_section=soup.find('div',{'class':'single-category'})
     hold_dict['section']=news_section.find('ul',{'class':'post-categories'}).text.strip().split('\n')
-    #text
     body=soup.find('div',{'class':'entry-content'})
     hold_dict['text'] = [paragraph.text.strip() for paragraph in body.find_all('p') if not paragraph.has_attr('class')]
-    # Authors
-    #hold_dict['authors'] = ['']
     if hold_dict['text'][-1].startswith('('):
         hold_dict['authors'] = hold_dict['text'][-1]
     else:
         hold_dict['authors']=[""]
-    #images
     if body.find_all('img'):
          hold_dict['images'] = [img['src'] for img in body.find_all('img')]
-    #Caption
     if soup.find('p', {'class': re.compile(r'caption')}):
         hold_dict['caption'] = soup.find('p', {'class': re.compile(r'caption')}).text
     else:
         hold_dict['caption'] = ['']
     return hold_dict
 
-# Testing
-url = 'https://www.thenewsnigeria.com.ng/2019/01/i-can-vouch-for-atiku-says-obasanjo/'
-thenews_html = urllib.request.urlopen(url)
-thenews = thenews_story(thenews_html)
-thenews['title']
-
-############################## NATIONAL DAULY NEWSPAPER
 def ndn_story(html):
     """
     There is no information for the sitemap when using https://www.nan.ng/robots.txt
     Section is messy, when multiple section couldn't divide them
     Images have no captions
+    url = 'http://nationaldailyng.com/code-of-conduct-tribunal-vs-saraki-free-speech-and-politics-of-contempt/'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
     header=soup.find('div', {'class':'td-post-header'})
-    #title
     hold_dict['title']=header.find('h1', {'class':'entry-title'}).text.strip()
-    #Date
     hold_dict['date']=header.find('div', {'class':'td-post-date'}).text
-    #Authors
     hold_dict['authors']= header.find('div',{'class':'td-post-author-name'}).text.strip().split('By')[1].split('-')[0]
-    #Section
     hold_dict['section']=header.find('ul', {'class':'td-category'}).text
-    #images
     picture=soup.find('div',{'class':'td-post-featured-image'})
     if soup.find('div', {'class':'td-post-featured-image'}):
         hold_dict['images'] = [img['src'] for img in picture.find_all('img')]
-    #text
     body=soup.find('div',{'class':'td-post-content'})
     paragraphs=[paragraph.text.strip() for paragraph in body.find_all('p')]
     if paragraphs==[]:
@@ -373,37 +298,29 @@ def ndn_story(html):
         hold_dict['text']=list(filter(None, text))
     else:
         hold_dict['text']=body_p=list(filter(None, paragraphs))
-    #Caption
     return hold_dict
 
-# Testing
-url = 'http://nationaldailyng.com/code-of-conduct-tribunal-vs-saraki-free-speech-and-politics-of-contempt/'
-thenews_html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-ndn = ndn_story(thenews_html)
-ndn['title']
 
-############################## BUSINESS DAILY
 def tdn_story(html):
     """
     Unable to strip the time from the date
     The html for the image is incomplete in the website it lacks www.businessdailyafrica.com, not sure if how I did it is the most efficient
     sitemap = https://www.businessdailyafrica.com/sitemap-index.xml
     just tested with 5 recent ones
+    url = 'https://www.businessdailyafrica.com/economy/Transport-minister-now-suspends-car-free-day/3946234-4958954-qhf99lz/index.html'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
-    # Title
     hold_dict['title'] = soup.find('h2', {'class':'article-title'}).text
-    # Date
     hold_dict['date'] =soup.find('small', {'class':'byline'}).text
-    # Authors
     hold_dict['authors'] = soup.find('header', {'class':'article-meta-summary'}).text.strip().split('By ')[1].split('\n')[0]
-    # images
     mainpic = soup.find('figure', {'class':'article-img-story'})
     if soup.find('figure', {'class':'article-img-story'}):
         src = [img['src'] for img in mainpic.find_all('img')]
         src.insert(0, 'www.businessdailyafrica.com')
-    hold_dict['images'] = [''.join(src[0:])]
+        hold_dict['images'] = [''.join(src[0:])]
+    else:
+        hold_dict['images'] = []
     # Caption
     hold_dict['caption'] = soup.find('figcaption',{'class':'attribution'}).text.strip().split('FILE PHOTO')[0]
     # Text
@@ -413,15 +330,11 @@ def tdn_story(html):
     hold_dict['section'] = [caption.text.strip() for caption in body.find_all('h5')][0]
     return hold_dict
 
-# Testing
-url = 'https://www.businessdailyafrica.com/economy/Transport-minister-now-suspends-car-free-day/3946234-4958954-qhf99lz/index.html'
-html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-tdn = tdn_story(html)
-tdn['text']
 
-
-############################## CITIZEN TV
 def cit_story(html):
+    '''
+    url = 'https://citizentv.co.ke/news/wambora-governor-with-9-lives-says-impeachment-attempts-have-taught-him-resilience-229263/'
+    '''
     hold_dict = {}
     soup = BeautifulSoup(html, 'lxml')
     hold_dict['title'] = soup.find('h1', {'class': 'articleh1'}).text
@@ -442,106 +355,69 @@ def cit_story(html):
          hold_dict['image_captions'] = [c.text.strip() for c in captions]
     return(hold_dict)
 
-# Testing
-url = 'https://citizentv.co.ke/news/wambora-governor-with-9-lives-says-impeachment-attempts-have-taught-him-resilience-229263/'
-html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-cit = cit_story(html)
-cit['text']
-
-############################## BUSINESS TODAY
 
 def bt_story(html):
     """
     I have an issue with the text, I wasn't able to take out some of the links in the paragraph because they are imbedded in paragraphs
     not sure why some images don't get scraped https://businesstoday.co.ke/october-inflation-5-53-food-electricity-prices-drop/ or https://businesstoday.co.ke/beta-healthcare-blames-promiscuous-man-condom-burst-case/
+    url = 'https://businesstoday.co.ke/cheap-commonly-used-physical-health-drugs-can-help-treat-mental-illness/'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
-    # Title
     hold_dict['title'] = soup.find('span', {'class':'post-title'}).text.strip()
-    # Date
     hold_dict['date'] = soup.find('span', {'class':'time'}).text.split('On ')[1]
-    # Authors
     hold_dict['authors'] = soup.find('span',{'class':'post-author-name'}).text.strip().split('By ')[1]
-    # images
     img = [i.find('img') for i in soup.find_all("figure")]
     if img:
          hold_dict['images'] = [img[0]['src']]
     else:
         hold_dict['images'] = []
-    # Caption
     captions = [i.find('figcaption') for i in soup.find_all("figure")]
     if captions:
          hold_dict['caption'] = [c.text.strip() for c in captions]
     else:
         hold_dict['caption'] = ['']
-    # Text
     body = soup.find('div', {'class':'entry-content clearfix single-post-content'})
     # pars = [paragraph.text.encode('ascii', 'ignore').decode() for paragraph in body if not paragraph.has_attr('a')]
     # hold_dict['text'] = pars
-    # section
     hold_dict['section'] = soup.find('div',{'class':'term-badges floated'}).text.strip()
     return hold_dict
 
-# Testing
-url = 'https://businesstoday.co.ke/cheap-commonly-used-physical-health-drugs-can-help-treat-mental-illness/'
-html = urllib.request.urlopen(urllib.request.Request(url, headers={
-       'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-       'accept-language': 'en-US,en;q=0.9,fr;q=0.8,ro;q=0.7,ru;q=0.6,la;q=0.5,pt;q=0.4,de;q=0.3',
-       'cache-control': 'max-age=0',
-       'upgrade-insecure-requests': '1',
-       'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36'}))
-bt = bt_story(html)
-bt['title']
 
-
-############################## DEVEX
 
 def devex_story(html):
     """
     weird symbols within the text, usually slashes not in all of them
     tested historically
+    url = 'https://www.devex.com/news/brazil-49844'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
-    # Title
     hold_dict['title'] =soup.find('h1', {'itemprop': 'headline'}).text.strip()
-    # Date
     hold_dict['date'] = soup.find('span', {'itemprop':'dateCreated'}).text
-    # Authors
     hold_dict['authors'] = soup.find('a', {'itemprop':'name'}).text
-    # images
     img = [i.find('img') for i in soup.find_all("figure")]
     if img:
          hold_dict['images'] = [img[0]['src']]
     else:
         hold_dict['images'] = []
-    # Caption
     captions = [i.find('figcaption') for i in soup.find_all("figure")]
     if captions:
          hold_dict['caption'] = [c.text.strip() for c in captions]
     else:
          hold_dict['caption'] = ['']
-    # Text
     body = soup.find('div', {'class':'article-content'}).find_all('p', recursive=False)
     hold_dict['text'] = [paragraph.text.encode('ascii', 'ignore').decode() for paragraph in body]
-    # section
     categories = soup.find('ul', {'class':'categories'})
     hold_dict['section'] =[sec.text for sec in categories.find_all('li')]
     return hold_dict
 
-# Testing
-url = 'https://www.devex.com/news/brazil-49844'
-html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-dev = devex_story(html)
-dev['text']
 
-############################## STANDARD MEDIA
 def standard_story(html):
     """
-    I tried stripping the nones of the section list but was unable to do so
-    There is something weird with the paragraphs
-    Date has the hour as well
+    url='https://www.standardmedia.co.ke/article/2001306089/raila-hosts-uhuru-in-first-kisumu-visit-since-handshake'
+    url = "https://www.standardmedia.co.ke/health/article/2001311787/kibra-mp-i-cannot-be-cured-but-i-will-manage-my-cancer"
+    url = "https://www.standardmedia.co.ke/article/2001304249/what-to-do-to-ensure-affordable-housing-fund-gets-critical-buy-in"
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
@@ -569,30 +445,19 @@ def standard_story(html):
     hold_dict['text'] = list(filter(None, body))
     return hold_dict
 
-url='https://www.standardmedia.co.ke/article/2001306089/raila-hosts-uhuru-in-first-kisumu-visit-since-handshake'
-url = "https://www.standardmedia.co.ke/health/article/2001311787/kibra-mp-i-cannot-be-cured-but-i-will-manage-my-cancer"
-url = "https://www.standardmedia.co.ke/article/2001304249/what-to-do-to-ensure-affordable-housing-fund-gets-critical-buy-in"
-html = urllib.request.urlopen(url)
-standard_story(html)
 
-############################## NEWSWATCH NIGERIA
 def nwn_story(html):
     """
     There is no caption for the pictures
-    #There is no information for the sitemap when using https://www.thenewsnigeria.com.ng/robots.txt
+    url = 'https://politicsngr.com/apc-governorship-aspirant-backs-direct-primaries/'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
     header=soup.find('header', {'id':'mvp-post-head'})
-    #title
     hold_dict['title']=header.find('h1', {'class':'mvp-post-title left entry-title'}).text.strip()
-    #Date
     hold_dict['date']=header.find('span', {'class':'mvp-post-date updated'}).text.strip()
-    #Authors
     hold_dict['authors']= header.find('div', {'class':'mvp-author-info-name left relative'}).text.strip().split('By ')[1]
-    #Section
     hold_dict['section']=header.find('h3', {'class':'mvp-post-cat left relative'}).text.strip()
-    #images
     body=soup.find('div', {'id':'mvp-content-main'})
     mainpic=soup.find('div',{'id':'mvp-post-feat-img'})
     feat_img=[img['src'] for img in mainpic.find_all('img')]
@@ -601,35 +466,26 @@ def nwn_story(html):
         hold_dict['images'] =feat_img
     else:
         hold_dict['images'] = [feat_img, other_img]
-    # text
     text = [paragraph for paragraph in body.find_all('p')]
-    # get rid of junk
     text = [p.text for p in text if not p.find('style')]
-    # split paragraphs
     text = [p.split('\n') for p in text]
     text = [item for sublist in text for item in sublist]
     text = [' '.join(t.split()) for t in text]
     hold_dict['text']=list(filter(None, text))
     return hold_dict
 
-url = 'https://politicsngr.com/apc-governorship-aspirant-backs-direct-primaries/'
-newswatch_html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-nwn_story(newswatch_html)
 
-############################## DAILY NEWS TANZANIA
 def dnt_story(html):
     """
     There is no caption for the pictures or section
     There is no information for the sitemap when using https://www.dailynews.co.tz/robots.txt
     If the images are broken the image link is empty
+    url = 'https://www.dailynews.co.tz/news/kisutu-court-acquits-tbc1-presenter-jerry-muro.aspx'
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
-    # Title
     hold_dict['title'] = soup.find('h4',{'class':'entry-title'}).text.strip()
-    # Date
     hold_dict['date'] = soup.find('div', {'class':'post-meta-date'}).text
-    # Authors
     firstline = soup.find('div',{'class':'post-meta-author'}).text.strip()
     if firstline.startswith('By'):
         hold_dict['authors'] = soup.find('div',{'class':'post-meta-author'}).text.strip().split('By ')[1]
@@ -638,10 +494,8 @@ def dnt_story(html):
             hold_dict['authors'] = soup.find('div',{'class':'post-meta-author'}).text.strip().split('From ')[1].split('in')[0]
         else:
             hold_dict['authors'] = firstline
-    # images
     mainpic = soup.find('div',{'class':'entry-media'})
     hold_dict['images'] = [img['src'] for img in mainpic.find_all('img')]
-    # Text
     body = soup.find('div', {'class':'entry-content'})
     text = [paragraph for paragraph in body.find_all('p')]
     text = [item for sublist in text for item in sublist]
@@ -649,19 +503,13 @@ def dnt_story(html):
     hold_dict['text'] = list(filter(None, pars))
     return hold_dict
 
-url = 'https://www.dailynews.co.tz/news/kisutu-court-acquits-tbc1-presenter-jerry-muro.aspx'
-html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-dnt_story(html)
-
-############################# fREEDOM HOUSE
 
 def fh_story(html):
     """
     Taking only first author when multiple, too inconsistent to get all
-    In the press realeases couldn't take out the last two paragraphs that are unnecessary
-    Wasn't able to extract the caption or the images, the way they are formatted was hard for me to call since there are similar classes for different objects
     No visible section in the webpage
-    https://freedomhouse.org/robots.txt works
+    url = 'https://freedomhouse.org/blog/elections-togo-what-happens-when-world-isn-t-watching'
+    url = "https://freedomhouse.org/blog/ethiopia-attack-civil-society-escalates-dissent-spreads"
     """
     hold_dict={}
     soup=BeautifulSoup(html, 'lxml')
@@ -689,10 +537,3 @@ def fh_story(html):
     else:
         hold_dict['captions'] = []
     return hold_dict
-
-url = 'https://freedomhouse.org/blog/elections-togo-what-happens-when-world-isn-t-watching'
-url = "https://freedomhouse.org/blog/ethiopia-attack-civil-society-escalates-dissent-spreads"
-url = "https://freedomhouse.org/blog/simba-ku-vanhu-zimbabwean-protesters-face-leadership-turmoil"
-url = "https://freedomhouse.org/blog/crackdown-online-media-reflects-new-status-quo-russia-s-internet-freedom"
-html =  urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})).read()
-fh_story(html)
