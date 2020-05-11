@@ -82,6 +82,7 @@
 ## Custom spaCy NER model
 1. Get [Phoenix agents, actors, etc ](https://github.com/openeventdata/Dictionaries)
 1. Run convert_phoenix.py
+1. Use the resulting model wherever you want NER
 
 ## Translation 
 1. Install OpenNMT-py
