@@ -1,4 +1,6 @@
-# peace-machine# Setting up the Pipeline
+# peace-machine
+
+# Setting up the Pipeline
 
 ## Install the required packages
 1. Install peace-machine from github: ```pip install -U git+https://github.com/ssdorsey/peace-machine.git```
