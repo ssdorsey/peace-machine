@@ -1,0 +1,11 @@
+news-please-mongo/newsplease/.resume_jobdir
+cache_dir
+data/finetuned-transformers/
+data/generic-NLP/
+data/translation/
+*.tgz
+*.prop
+.vscode
+.ipynb_checkpoints
+nyt_corpus.csv
+google_translate_key.json
