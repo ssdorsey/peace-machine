@@ -3,7 +3,6 @@ cache_dir
 data/finetuned-transformers/
 data/generic-NLP/
 data/translation/
-/test/spacy_training/
 *.tgz
 *.prop
 .vscode
