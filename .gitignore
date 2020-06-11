@@ -1,11 +1,10 @@
 news-please-mongo/newsplease/.resume_jobdir
 cache_dir
-data/finetuned-transformers/
-data/generic-NLP/
-data/translation/
+peacemachine/data/*
 *.tgz
 *.prop
 .vscode
 .ipynb_checkpoints
+*__pycache__*
 nyt_corpus.csv
 google_translate_key.json

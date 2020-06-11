@@ -1,6 +1,0 @@
-title
-maintext
-url
-date_publish
-bad_location
-event_type

@@ -21,6 +21,7 @@
     * Create an index for the collection on the "url" field: ```db.articles.createIndex({'url':1}, {unique: true})```
         * This is so duplicate url's aren't inserted and we can do quick searches on the url
 1. Set up [access control](https://docs.mongodb.com/manual/tutorial/enable-authentication/)
+1. Set up [firewall permissions](https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-18-04)
 1. Create known actors collection
 1. Create locations collection
     * Download/unzip GADM in GeoPackage format: https://gadm.org/download_world.html
@@ -28,13 +29,11 @@
 
 ## Setup ElasticSearch wikipedia
 1. Install [ElasticSearch](https://linuxize.com/post/how-to-install-elasticsearch-on-ubuntu-18-04/)
-1. Download wikipedia content and index
-    * Go to a recent page on [here](https://dumps.wikimedia.org/other/cirrussearch/)
-    * Download something that looks like "enwiki-20200427-cirrussearch-content.json.gz" (numbers will be different)
-1. [Import into ElasticSearch](https://stackoverflow.com/questions/33630222/indexing-wikipedia-dump-to-elasticsearch-gets-xml-document-structures-must-start)
-    * Fetch the current mapping: ```curl https://en.wikipedia.org/w/api.php?action=cirrus-mapping-dump&format=json > mapping.json```
-    * Feed that mapping into elasticsearch: ```jq .content < mapping.json | curl -XPUT localhost:9200/enwiki_content --data @-```
-    * Load the dump: ```zcat enwiki-20200427-cirrussearch-general.json.gz | parallel --pipe -L 2 -N 2000 -j3 'curl -s http://localhost:9200/enwiki_content/_bulk --data-binary @- > /dev/null'```
+1. Import [Wikipedia](http://fuzihao.org/blog/2018/01/01/Struggling-in-importing-wikipedia-into-Elasticsearch/)
+    * wiki_to_elastic.py
+1. Attach whatever [pageview stats](https://dumps.wikipedia.org/other/pageviews/) you want.
+    * download_wikimedia_pageviews.py
+    * attach_wikipedia_pageviews.py
 
 
 ## Run the Scrapers

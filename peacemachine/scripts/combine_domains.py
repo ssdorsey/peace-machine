@@ -26,12 +26,12 @@ def write_sitelist(domains, output_file):
     master = {'base_urls': []}
 
     for dd in domains:
-        master['base_urls'].append({'url': f'http://www.{dd}', 'crawler':'SitemapCrawler'})
-        master['base_urls'].append({'url': f'http://www.{dd}', 'crawler':'RecursiveCrawler'})
+        master['base_urls'].append({'url': f'http://www.{dd}', 'crawler':'RecursiveSitemapCrawler'})
 
     with open(output_file, 'w') as _file:
         json.dump(master, _file)
 
 
 domains = get_domains()
-write_sitelist(domains, '/home/spenc/news-please-repo/sitelist.hjson')
+write_sitelist(domains, '/home/devlab/Dropbox/news-please-mongo/sitelist.hjson')
+write_sitelist(domains, '/media/devlab/HDD0/news-please-repo/config/sitelist.hjson')
