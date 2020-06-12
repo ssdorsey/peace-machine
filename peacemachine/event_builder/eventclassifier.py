@@ -13,7 +13,7 @@ from datetime import datetime
 from dateutil.parser import ParserError
 from dateutil.parser import parse
 
-from elasticsearch import Elasticsearch
+# from elasticsearch import Elasticsearch
 
 
 from peacemachine.event_builder import helpers
@@ -25,7 +25,7 @@ if sys.platform=='win32' or os.environ['USER'] != 'devlab':
 else:
     db = MongoClient('mongodb://ml4pAdmin:ml4peace@localhost').ml4p
 
-es =  Elasticsearch(['http://192.168.176.240:9200'])
+# es =  Elasticsearch(['http://192.168.176.240:9200'])
 
 model = ClassificationModel('roberta'
                             , 'peacemachine/data/finetuned-transformers/ModelOutput'
@@ -82,6 +82,7 @@ def process_docs(list_docs, language='en'):
     """
     inserted_count = 0
     list_docs = Parallel(n_jobs=-2)(delayed(helpers.build_combined)(doc) for doc in list_docs)
+    # list_docs = [helpers.build_combined(ld) for ld in list_docs]
 
     list_docs = [dd for dd in list_docs if 'combined' in dd and dd['combined']]
 
@@ -93,6 +94,7 @@ def process_docs(list_docs, language='en'):
     ### get the location
     if language == 'en':
         bad_locations = Parallel(n_jobs=-2)(delayed(helpers.pull_country)(doc['combined']) for doc in list_docs)
+        # bad_locations = [helpers.pull_country(ld['combined']) for ld in list_docs]
         for nn, doc in enumerate(list_docs):
             doc['bad_location'] = bad_locations[nn]
             if not doc['bad_location'] and doc['domain'] in helpers.domain_locs:
@@ -147,8 +149,8 @@ def process_docs(list_docs, language='en'):
             error_urls.append(doc['url'])
 
         # then elasticsearch
-        doc.pop('_id', None)
-        res = es.index(index="events", id=create_id(doc), body=doc)
+        # doc.pop('_id', None)
+        # res = es.index(index="events", id=create_id(doc), body=doc)
 
     print(f'inserted_count: {inserted_count}')
     print(f'error count: {len(error_urls)}')
@@ -187,6 +189,11 @@ for _doc in tqdm(cursor):
         except:
             continue
 
+    # check that I don't already have it
+    col_name = f"{_doc['date_publish'].year}-{_doc['date_publish'].month}-events"
+    if bool(db[col_name].find_one({'_id':_doc['_id']})):
+        continue
+
     if 'html' in _doc:
         del _doc['html']
 
@@ -194,9 +201,12 @@ for _doc in tqdm(cursor):
 
     # process
     if len(hold_ee) >= 768:
+        break
         process_docs(hold_ee)
         hold_ee = []
         count = 0
+
+    count += 1
 
     # cut off if querying without finding anything
     if count > 30000:
@@ -247,6 +257,11 @@ for _doc in tqdm(cursor):
         except:
             continue
 
+    # make sure it's not in the collection already
+    col_name = f"{_doc['date_publish'].year}-{_doc['date_publish'].month}-events"
+    if bool(db[col_name].find_one({'_id':_doc['_id']})):
+        continue
+
     if 'html' in _doc:
         del _doc['html']
 
@@ -256,6 +271,8 @@ for _doc in tqdm(cursor):
         process_docs(hold_ee, language='ne')
         hold_ee = []
         count = 0
+    
+    count += 1
 
     # cut off if querying without finding anything
     if count > 30000:
