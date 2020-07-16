@@ -11,21 +11,11 @@ import unicodedata
 from urllib.parse import urlparse
 import nltk
 import pandas as pd
+import numpy as np
 import spacy 
 nlp = spacy.load('en_core_web_sm')
 
-def strip_url(url):
-    """
-    strips a url of all the fluff
-    """
-    parsed = urlparse(url)
-    sturl = parsed.netloc + parsed.path
-    # strip www.
-    sturl = sturl.replace('www.', '')
-    return sturl
-
-
-def cut_dateline(_string, thresh=30):
+def cut_dateline(text, thresh=30):
     """
     removes the dateline from the beginning of a news story
     :param text: string, generally the body of a news story that may have a 
@@ -33,18 +23,20 @@ def cut_dateline(_string, thresh=30):
     :param thresh: how far into the text to look for the dateline indicators
     :return: string with dateline cut out
     """
-    if ' —' in _string[:thresh]:
-        return _string[_string.index(' — ')+3:]
-    elif '--' in _string[:thresh]:
-        return _string[_string.index('--')+2:]
-    elif ' -' in _string[:thresh]:
-        return _string[_string.index(' - ')+3:]
-    elif ': ' in _string[:thresh-10]:
-        return _string[_string.index(': ')+2:]
-    elif bool(re.search(r'(\(.*?\)\s)', _string[:thresh])):
-        return re.sub(r'(\(.*?\))', '', _string)
+    if ' — ' in text[:30]:
+        return text[text.index(' — ')+3:]
+    elif '--' in text[:30]:
+        return text[text.index('--')+2:]
+    elif ' - ' in text[:30]:
+        return text[text.index(' - ')+3:]
+    # get rid of the CNN dateline
+    elif '(CNN)' in text[:30]:
+        return text[text.index('(CNN)')+5:]
+    elif ': ' in text[:20]:
+        return text[text.index(': ')+2:]
     # if no dateline is found, return the same string
-    return _string
+    return text
+
 
 def parse_date(date):
     """
@@ -181,11 +173,11 @@ def build_combined(doc):
 
 # import background info for placing events roughly
 # TODO: create a local Nomin
-demo = pd.read_csv('peacemachine/data/demonyms.csv')
+demo = pd.read_csv('data/demonyms.csv')
 demo = pd.Series(demo.location.values,index=demo.demonym).to_dict()
 demonyms = list(demo.keys())
 locations = set(demo.values())
-city_country = pd.read_csv('peacemachine/data/world-cities.csv')
+city_country = pd.read_csv('data/world-cities.csv')
 city_dict = pd.Series(city_country.country.values,index=city_country.city).to_dict()
 cities = list(city_dict.keys())
 countries = set([cc.lower() for cc in city_country['country']])
@@ -212,7 +204,7 @@ def is_country(name):
         return(country.title())
 
     else:
-        return(None)
+        return(np.nan)
 
 def most_frequent(_list): 
     return max(set(_list), key = _list.count) 
@@ -277,12 +269,12 @@ def pull_country(sentences):
         return most_frequent([is_country(gg) for gg in gpes])
 
 # insert the location for local sources that don't have one
-available_countries = [fn.split('_')[1].split('.')[0] for fn in os.listdir('peacemachine/data/domains') 
+available_countries = [fn.split('_')[1].split('.')[0] for fn in os.listdir('data/domains') 
     if fn.startswith('domains_') and not fn.endswith('international.txt')]
 
 domain_locs = {}
 for ac in available_countries:
-    with open(f'peacemachine/data/domains/domains_{ac}.txt', 'r') as _file:
+    with open(f'data/domains/domains_{ac}.txt', 'r') as _file:
         domains = [dd.strip() for dd in _file.readlines()]
     for dd in domains:
         domain_locs[dd] = ac

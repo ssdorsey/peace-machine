@@ -1,0 +1,17 @@
+apnews.com
+reuters.com
+bbc.com
+nytimes.com
+washingtonpost.com
+aljazeera.com
+theguardian.com
+dw.com
+france24.com
+bloomberg.com
+ft.com
+wsj.com
+csmonitor.com
+latimes.com
+scmp.com
+xinhuanet.com
+news.yahoo.com

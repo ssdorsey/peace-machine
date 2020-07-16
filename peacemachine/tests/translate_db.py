@@ -4,67 +4,25 @@ import sys
 import re
 import pickle
 import nltk
-# nltk.download('punkt')
+nltk.download('punkt')
 from tqdm import tqdm
 from pymongo import MongoClient
 from urllib.parse import urlparse
 import torch
 from transformers import AutoTokenizer, AutoModelWithLMHead
-from simpletransformers.classification import ClassificationModel
+import pandas as pd
 
 if sys.platform=='win32' or os.environ['USER'] != 'devlab':
-    db = MongoClient('mongodb://ml4pAdmin:ml4peace@devlab-server').ml4p
+    db = MongoClient('mongodb://ml4pAdmin:ml4peace@192.168.176.240').ml4p
 else:
     db = MongoClient('mongodb://ml4pAdmin:ml4peace@localhost').ml4p
 
-def cut_dateline(_string, thresh=30):
-    """
-    removes the dateline from the beginning of a news story
-    :param text: string, generally the body of a news story that may have a 
-                    dateline
-    :param thresh: how far into the text to look for the dateline indicators
-    :return: string with dateline cut out
-    """
-    try:
-        if ' —' in _string[:thresh]:
-            return _string[_string.index(' —')+2:]
-        elif '--' in _string[:thresh]:
-            return _string[_string.index('--')+2:]
-        elif ' -' in _string[:thresh]:
-            return _string[_string.index(' -')+2:]
-        elif ': ' in _string[:thresh-10]:
-            return _string[_string.index(': ')+2:]
-        elif bool(re.search(r'(\(.*?\)\s)', _string[:thresh])):
-            return re.sub(r'(\(.*?\))', '', _string)
-        # if no dateline is found, return the same string
-        return _string
-    except AttributeError:
-        return ''
-
+# db = MongoClient('mongodb://ml4pAdmin:ml4peace@vpn.ssdorsey.com').ml4p
 
 # -----------------------------
 # classification model
 # -----------------------------
-label_dict = pickle.load( open( "../data/LAC/label_dict.p", "rb" ) )
-label_dict = {v:k for k,v in label_dict.items()}
 
-# TODO: convert to CLASS
-
-# def load_models(reload_models=False):
-#     """
-#     load the default translation and classification models
-#     """
-#     if reload_models:
-#         del class_model
-#         del lang_model
-#         torch.cuda.empty_cache()
-# load the classification model
-class_model = ClassificationModel('roberta'
-                            , '../data/LAC/StackedModel_no999'
-                            , num_labels=25
-                            , args={
-                                'n_gpu':1
-                                ,'eval_batch_size':768})
 # load the translation model
 model_name = 'Helsinki-NLP/opus-mt-ROMANCE-en'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -72,7 +30,6 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 lang_model = AutoModelWithLMHead.from_pretrained(model_name)
 lang_model = lang_model.to('cuda')
     
-
 # -----------------------------
 # language model
 # -----------------------------
@@ -83,20 +40,10 @@ lang_model = lang_model.to('cuda')
 _locals = ['extra.ec','eluniverso.com','elcomercio.com','eltelegrafo.com','lahora.com.ec','eldiario.ec','expreso.ec','metroecuador.com.ec','ultimasnoticias.ec','diarioque.ec','ppelverdadero.com.ec','elmercurio.com.ec','eltiempo.com.ec','laprensa.com.ec','lagaceta.com.ec','elnorte.ec','noticias.caracoltv.com','bluradio.com','noticias.canalrcn.com','lasillarota.com','lasillavacia.com','elespectador.com','eltiempo.com','portafolio.co','semana.com','canal1.com.co','elcolombiano.com','elheraldo.co','vanguardia.com','elnuevosiglo.com.co','eluniversal.com.co','elpais.com.co','lafm.com.co','citytv.com.co','diarioadn.co','pacifista.tv','razonpublica.com','verdadabierta.com','caracol.com.co','pulzo.com','cuestionpublica.com','lacoladerata.co','proclamadelcauca.com','universocentro.com','laorejaroja.com','lanuevaprensa.com.co','baudoap.com','sapienscol.com','rutasdelconflicto.com']
 _internationals = ['apnews.com','reuters.com','bbc.com','nytimes.com','washingtonpost.com','aljazeera.com','theguardian','dw.com','france24.com','bloomberg.com','ft.com','wsj.com','csmonitor.com','latimes.com']
 
-
-def pull_domain(url):
-    """
-    Pull the domain (without www.) from a url
-    :param: string in url format
-    :return: string of only domain
-    """
-    domain = urlparse(url).netloc
-    if domain.startswith('www.'):
-        domain = domain[4:]
-    return domain
+locals_regex = r'(extra\.ec|eluniverso\.com|elcomercio\.com|eltelegrafo\.com|lahora\.com\.ec|eldiario\.ec|expreso\.ec|metroecuador\.com\.ec|ultimasnoticias\.ec|diarioque\.ec|ppelverdadero\.com\.ec|elmercurio\.com\.ec|eltiempo\.com\.ec|laprensa\.com\.ec|lagaceta\.com\.ec|elnorte\.ec|caracoltv\.com|bluradio\.com|noticias\.canalrcn\.com|lasillarota\.com|lasillavacia\.com|elespectador\.com|eltiempo\.com|portafolio\.co|semana\.com|canal1\.com\.co|elcolombiano\.com|elheraldo\.co|vanguardia\.com|elnuevosiglo\.com\.co|eluniversal\.com\.co|elpais\.com\.co|lafm\.com\.co|citytv\.com\.co|diarioadn\.co|pacifista\.tv|razonpublica\.com|verdadabierta\.com|caracol\.com\.co|pulzo\.com|cuestionpublica\.com|lacoladerata\.co|proclamadelcauca\.com|universocentro\.com|laorejaroja\.com|lanuevaprensa\.com\.co|baudoap\.com|sapienscol\.com|rutasdelconflicto\.com)'
 
 
-def batch_translate(list_strings, n=16):
+def batch_translate(list_strings, n=32):
     """
     batches and translates a list of strings
     :param list_strings: list of strings to translate
@@ -105,7 +52,7 @@ def batch_translate(list_strings, n=16):
     # chunk the list into chunks size=n
     chunks = [list_strings[i:i + n] for i in range(0, len(list_strings), n)]
     # translate each chunk
-    translated = []
+    res = []
     for chunk in chunks:
         # convert to tensor batches
         batch = tokenizer.prepare_translation_batch(src_texts=chunk)
@@ -116,161 +63,117 @@ def batch_translate(list_strings, n=16):
         # decode
         translated_chunk = [tokenizer.decode(t, skip_special_tokens=True) for t in translated_chunk]
         # add back into master list
-        translated += translated_chunk
+        res += translated_chunk
         del translated_chunk
         del batch
         torch.cuda.empty_cache()
-    return translated
+    return res
 
 
 def tci_locals(list_docs):
-    #### translate
-    # pull the pieces of the doc
-    titles = [ld['title'][:200] for ld in list_docs]
-    first_sentences = []
-    for ld in list_docs:
-        if ld['maintext']:
-            try:
-                cut = cut_dateline(ld['maintext'])
-                first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
-            except:
-                first_sentences.append('nan')
-        else:
-            first_sentences.append('nan') # TODO: figured out a better way to deal with empty strings
+    ### pull what I want 
+
+    to_translate = []
+
+    for _doc in list_docs:
+        to_translate.append([_doc['title'][:128], 'title', _doc['_id']])
+
+        if _doc['maintext'] and len(_doc['maintext']) > 0:
+            sent_tok = nltk.sent_tokenize(_doc['maintext'], language='spanish')
+            # clip long and get rid of \n and ---
+            sent_tok = [st[:256].replace('\n', '. ') for st in sent_tok]
+            sent_tok = [re.sub(r'(-{3,})', ' ', st) for st in sent_tok]
+            to_translate.append([sent_tok[0], 'mt0', _doc['_id']])
+            if len(sent_tok) > 1:
+                to_translate.append([sent_tok[1], 'mt1', _doc['_id']])
     
-    translated_titles = batch_translate(titles)
-    translated_first_sentences = batch_translate(first_sentences)
-
-    #### classify
-    translated_combined = [translated_titles[ii] + ' ' +
-                            translated_first_sentences[ii] for 
-                            ii in range(len(translated_titles))]
-    preds, model_outputs = class_model.predict(translated_combined)
-    preds_cut = preds
-    # modify outputs
-    model_max = [float(max(mo)) for mo in model_outputs]
-    # threshold for 999
-    for ii in range(len(model_max)):
-        if model_max[ii] < 7: # TODO: CHECK THIS CUTOFF
-            preds_cut[ii] = 0
-    pred_types = [label_dict[ii] for ii in preds_cut]
-    # insert
-    for nn, ld in enumerate(list_docs):
-        # insert everthing into article
-        ld['title_translated'] = translated_titles[nn]
-        ld['maintext_translated'] = translated_first_sentences[nn]
-        db.articles.update_one(
-            {'_id': ld['_id']}, 
-            {'$set': {
-                'title_translated':ld['title_translated'],
-                'maintext_translated': ld['maintext_translated']
-            }}
-        )
-        # now insert into the new lac category
-        # drop the categories I don't want
-        ld = {kk:vv for kk, vv in ld.items() if kk in {'url', 'date_publish', 'bad_location'}}
-        # insert only url, date_publish, bad_location, event_type info to lac collection
-        ld['event_type'] = pred_types[nn]
-        ld['model_outputs'] = [float(num) for num in model_outputs[nn]]
-        try:
-            db.lac.replace_one({'url':ld['url']}, ld, upsert=True)
-        except:
-            print('ERROR ON: ', ld['url'])
-            pass
-
-def tci_internationals(list_docs):
     #### translate
-    # pull the pieces of the doc
-    titles = [ld['title'][:200] for ld in list_docs]
-    first_sentences = []
-    for ld in list_docs:
-        if ld['maintext']:
-            cut = cut_dateline(ld['maintext'])
-            first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
-        else:
-            first_sentences.append('nan') # TODO: figured out a better way to deal with empty strings
+    start = time.time()
+    translated = batch_translate([tt[0] for tt in to_translate])
+    end = time.time()
+    per_sec = len(translated) / (end-start)
+    print('Translation iterations per second: ', per_sec)
 
-    #### classify
-    combined = [titles[ii] + ' ' + first_sentences[ii] for ii in range(len(titles))]
-    preds, model_outputs = class_model.predict(combined)
-    preds_cut = preds
-    # modify outputs
-    model_max = [float(max(mo)) for mo in model_outputs]
-    # threshold for 999
-    for ii in range(len(model_max)):
-        if model_max[ii] < 7: # TODO: CHECK THIS CUTOFF
-            preds_cut[ii] = 0
-    pred_types = [label_dict[ii] for ii in preds_cut]
+    # merge back in 
+    together = []
+    for nn, tt in enumerate(to_translate):
+        together.append(tt + [translated[nn]])
+
+    title_df = pd.DataFrame([tt for tt in together if tt[1]=='title'], 
+                            columns=['original', 'type', '_id', 'title'])
+    title_df.drop(['type', 'original'], axis=1, inplace=True)
+
+    mt0_df = pd.DataFrame([tt for tt in together if tt[1]=='mt0'], 
+                            columns=['original', 'type', '_id', 'mt0'])
+    mt0_df.drop(['type', 'original'], axis=1, inplace=True)
+
+    mt1_df = pd.DataFrame([tt for tt in together if tt[1]=='mt1'], 
+                            columns=['original', 'type', '_id', 'mt1'])
+    mt1_df.drop(['type', 'original'], axis=1, inplace=True)
+
+    df = title_df.merge(mt0_df, on='_id')
+    df = df.merge(mt1_df, on='_id')
+
     # insert
-    for nn, ld in enumerate(list_docs):
-        # now insert into the new lac category
-        # drop the categories I don't want
-        ld = {kk:vv for kk, vv in ld.items() if kk in {'url', 'date_publish', 'bad_location'}}
-        # insert only url, date_publish, bad_location, event_type info to lac collection
-        ld['event_type'] = pred_types[nn]
-        ld['model_outputs'] = [float(num) for num in model_outputs[nn]]
+    for ind in df.index:
+        # insert everthing into article
         try:
-            db.lac.replace_one({'url':ld['url']}, ld, upsert=True)
+            db.articles.update_one(
+                {'_id': df['_id'].iloc[ind]}, 
+                {'$set': {
+                    'title_translated': df['title'].iloc[ind],
+                    'maintext_translated': df.loc[ind, 'mt0'] +'. '+ df.loc[ind, 'mt1']
+                }}
+            )
         except:
-            print('ERROR ON: ', ld['url'])
-            pass
+            print('ERROR INSERTING')
 
 
 if __name__ == "__main__":
-    # load models
-    # load_models()
-
-    cursor = db.articles.find()
 
     rc_re = re.compile(r'(China|Chinese|Chino|PRC|Russia|Rusia|Ruso|Rusa)', re.IGNORECASE)
-    ec_re = re.compile(r'(Ecuador|Colombia)', re.IGNORECASE)
+
+    cursor = db.articles.find(
+        {
+            'source_domain': {'$in': _locals},
+            'title':{'$ne': ''},
+            'title_translated': {'$exists': False}, 
+            # '$or': [
+            #     {'title': {'$regex': rc_re}}, 
+            #     {'maintext': {'$regex': rc_re}}
+            # ]
+        }
+    ).batch_size(32)
 
     hold_locals = []
-    hold_internationals = []
 
     for _doc in tqdm(cursor):
-        try:
-            # pull the domain
-            domain = pull_domain(_doc['url'])
-            # deal with missing text
-            try:
-                all_text = _doc['title'] + ' ' + _doc['maintext']
-            except:
-                all_text = _doc['title']
-
-            # attach qualifying document to a holding list as I loop through
-            if domain in _locals:
-                if (bool(rc_re.search(all_text))): # mentions China or Russia
-                    # and not bool(db.lac.find_one({'url':_doc['url']}))): # not already encoded
-                    hold_locals.append(_doc)
-            
-            if domain in _internationals:
-                if (bool(rc_re.search(all_text)) # mentions China or Russia
-                    and bool(ec_re.search(all_text))): # mentions Ecuador or Colombia
-                    # and not bool(db.lac.find_one({'url':_doc['url']}))): # not already encoded
-                    hold_internationals.append(_doc)
-        except:
-            print('ERROR!')
-            pass
-
-        # if either document bank hits 768, process the docs before collecting more
-        if len(hold_locals) >= 768:
-            # print('GOT LOCALS BATCH')
-            # break
+        hold_locals.append(_doc)
+        if len(hold_locals) >= 32:
             print('DOING LOCALS')
             tci_locals(hold_locals)
             hold_locals = []
 
-        if len(hold_internationals) >= 768:
-            # print('GOT INTERNATIONALS BATCH')
-            # break
-            print('DOING INTERNATIONALS')
-            tci_internationals(hold_internationals)
-            hold_internationals = []
+    # split into 8 pieces
+    # rc_re = re.compile(r'(China|Chinese|Chino|PRC|Russia|Rusia|Ruso|Rusa)', re.IGNORECASE)
 
-    # get all the leftovers
-    if len(hold_locals) > 0:
-        tci_locals(hold_locals)
+    cursor = db.articles.find(
+        {
+            'source_domain': {'$in': _locals},
+            'title':{'$ne': ''},
+            'title_translated': {'$exists': False}, 
+            '$or': [
+                {'title': {'$regex': rc_re}}, 
+                {'maintext': {'$regex': rc_re}}
+            ]
+        }
+    )
 
-    if len(hold_internationals) > 0:
-        tci_internationals(hold_internationals)
+    # # get all the urls
+    urls = [_doc['url'] for _doc in tqdm(cursor)]
+    url_chunks = np.array_split(np.array(urls), 8)
+
+    for nn, uc in enumerate(url_chunks):
+        with open(f'DELETE_LAC_chunk{nn}.txt', 'w') as _file:
+            for url in uc:
+                _file.write(f'{url}\n')

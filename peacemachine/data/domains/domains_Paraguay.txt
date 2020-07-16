@@ -1,0 +1,9 @@
+abc.com.py
+paraguay.com
+ultimahora.com
+hoy.com.py
+lanacion.com.py
+5dias.com.py
+adndigital.com.py
+cronica.com.py
+independiente.com.py

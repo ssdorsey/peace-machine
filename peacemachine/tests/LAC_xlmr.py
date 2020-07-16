@@ -98,9 +98,15 @@ def tci_locals(list_docs):
     titles = [ld['title'] for ld in list_docs]
     first_sentences = []
     for ld in list_docs:
-        if ld['maintext']:
+        if 'maintext' in ld and ld['maintext']:
             try:
                 cut = cut_dateline(ld['maintext'])
+                first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
+            except:
+                first_sentences.append('nan')
+        elif 'description' in ld and ld['description']:
+            try:
+                cut = cut_dateline(ld['description'])
                 first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
             except:
                 first_sentences.append('nan')
@@ -111,6 +117,9 @@ def tci_locals(list_docs):
     combined = [titles[ii] + ' ' +
                             first_sentences[ii] for 
                             ii in range(len(titles))]
+    if len(combined) == 0:
+        print('NOTHING TO CLASSIFY')
+        return False
     preds, model_outputs = xlmr.predict(combined)
     preds_cut = preds
     # modify outputs
@@ -142,9 +151,18 @@ def tci_internationals(list_docs):
     titles = [ld['title'] for ld in list_docs]
     first_sentences = []
     for ld in list_docs:
-        if ld['maintext']:
-            cut = cut_dateline(ld['maintext'])
-            first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
+        if 'maintext' in ld and ld['maintext']:
+            try:
+                cut = cut_dateline(ld['maintext'])
+                first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
+            except:
+                first_sentences.append('nan')
+        elif 'description' in ld and ld['description']:
+            try:
+                cut = cut_dateline(ld['description'])
+                first_sentences.append(nltk.sent_tokenize(cut)[0][:400])
+            except:
+                first_sentences.append('nan')
         else:
             first_sentences.append('nan') # TODO: figured out a better way to deal with empty strings
 
@@ -152,6 +170,9 @@ def tci_internationals(list_docs):
     combined = [titles[ii] + ' ' + first_sentences[ii] for ii in range(len(titles))]
     preds, model_outputs = roberta.predict(combined)
     preds_cut = preds
+    if len(combined) == 0:
+        print('NOTHING TO CLASSIFY')
+        return False
     # modify outputs
     model_max = [float(max(mo)) for mo in model_outputs]
     # threshold for 999
@@ -231,3 +252,19 @@ if __name__ == "__main__":
     if len(hold_internationals) > 0:
         tci_internationals(hold_internationals)
 
+
+import random
+
+# get all the collections
+collections = [col for col in db.list_collection_names() if col.endswith('-events')]
+# just keep the year range we want
+collections = [col for col in collections if (int(col.split('-')[0]) >= 2010) and (int(col.split('-')[0]) <= 2020)]
+
+rand_events = []
+
+for collection in collections:
+    cursor = db[collection].find()
+    count = cursor.count()
+    random_event = cursor[random.randint(0,count)]
+    # attach the maintext if you want to here
+    rand_events.append(random_event)

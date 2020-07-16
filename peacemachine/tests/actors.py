@@ -2,18 +2,20 @@ import re
 import spacy
 import pandas as pd
 from allennlp.predictors import Predictor
-import allennlp_models.syntax.srl
+import allennlp_models.structured_prediction.predictors.srl
+# import allennlp_models.syntax.srl
 
-nlp = spacy.load('../data/actors/phoenix_ner')
+nlp = spacy.load('data/actors/phoenix_ner')
 _srl = Predictor.from_path("https://storage.googleapis.com/allennlp-public-models/bert-base-srl-2020.03.24.tar.gz",
                             cuda_device=0)
 
 # data = pd.read_csv('../data/actor_data_V2.csv')
 
-sentence = "Journalists and academics were arrested by Kenyan police in a renewed crackdown on dissent"
+sentence = "Journalists and academics were arrested by Kenyan police in a renewed crackdown on dissent."
 sentence2 = 'German Chancellor Angela Merkel said on Wednesday that social distancing rules to contain the spread of the coronavirus would remain in place until at least May 3 but some shops could reopen next week.'
 sentence3 = 'Tom Jones, a local reporter, was savagely beat by hooligans yesterday evening.'
 sentence4 = 'Ban-Ki Moon, the U.N. Secretary General, has announced that he will step down at the end of this year.'
+
 
 def pull_verb_dict(verb_set):
     """
@@ -64,7 +66,6 @@ class Actors:
         # if one of my ARGS is still missing an entity / agent, include noun chunk or whole arg
 
 
-
     def get_root(self):
         """
         pulls the root out of a spaCy doc
@@ -83,6 +84,7 @@ class Actors:
         #             root = ch
         #             break
         return root
+
 
     def get_entities(self):
         """

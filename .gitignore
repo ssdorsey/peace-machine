@@ -1,6 +1,9 @@
 news-please-mongo/newsplease/.resume_jobdir
 cache_dir
-peacemachine/data/*
+peacemachine/data/finetuned-transformers/*
+peacemachine/data/LAC/*
+peacemachine/data/translation/*
+peacemachine/data/wikipedia/*
 *.tgz
 *.prop
 .vscode

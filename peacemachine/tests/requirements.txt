@@ -1,0 +1,5 @@
+nltk
+tqdm
+pymongo
+torch
+transformers
