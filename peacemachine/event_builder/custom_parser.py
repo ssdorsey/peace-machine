@@ -44,11 +44,11 @@ def checkForMissingValues(filename):
     
 
 #%%  
-missing_data = checkForMissingValues('../domains/domains_Benin.txt')
+missing_data = checkForMissingValues('../../../domains/domains_Kenya.txt')
 
 
 # %%
-def kohajone_story(soup):
+def kohajonecom_story(soup):
     """
     Function to pull the information we want from Kohajone stories
     :param soup: BeautifulSoup object, ready to parse
@@ -71,7 +71,7 @@ def kohajone_story(soup):
         date = article_date.find('a').text
     except: 
         date = ''
-    hold_dict['date'] = date
+    hold_dict['date'] = dateparser.parse(date)
     return hold_dict
 
 #%%
@@ -100,20 +100,20 @@ def gazetashqiptareal_story(soup):
     #text
     try:
         article_body = soup.find('div', attrs={"class":"content_right"})
-        maintext = [para.text for para in article_body.find_all('p')]
+        unwanted = article_body.find('div', attrs={"class": "comment_section block_section"})
+        unwanted.extract()
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext)
     except:
         article_body = None
     #date
     try:
-        article_date = soup.find('div', attrs={"class":"single_meta block_section"})
+        article_date = soup.find('span', attrs={"class":"news_item__date"})
+        date = article_date.text.split("-")[1].strip()
+        print(date)
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
-    try:
-        date = article_date.find('span').text
-    except:
-        date = ''
-    hold_dict['date'] = date
     #title
     try:
         hold_dict['title'] = soup.find('h1', attrs={"class": "single_article__title"}).text
@@ -138,14 +138,11 @@ def gazetadita_story(soup):
     
     #date
     try:
-        article_date = soup.find('div', attrs={"class":"a-content"})
+        article_date = soup.find('span', attrs={"class":"meta"})
+        date = article_date.text.strip()
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
-    try:
-        date = article_date.find('span', attrs={"class":"meta"}).text.strip()
-    except:
-        date = ''
-    hold_dict['date'] = date
     #title
     try:
         article_title = soup.find('h1')
@@ -172,7 +169,7 @@ def telegraf_story(soup):
     try:
         article_date = soup.find('time')
         date = article_date['datetime']
-        hold_dict['date'] = date
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
        
@@ -202,12 +199,275 @@ def beninwebtv_story(soup):
     try:
         article_date = soup.find('time')
         date = article_date['datetime']
-        hold_dict['date'] = date
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
     #title
-    article_title = soup.find('h1', attrs={"class": "single-post-title"})
-    hold_dict['title'] = article_title.text
+    try:
+        article_title = soup.find('h1', attrs={"class": "single-post-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+# %%  
+def newsacotonou_story(soup):
+    """
+    Function to pull the information we want from News.Acotonou stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('span', attrs={"class": "FullArticleTexte"})
+        hold_dict['maintext'] = article_body.text.strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "FontArticleSource"}).text.split("|")[0].split(" ")[2:]
+        date = " ".join(article_date)
+        hold_dict['date'] = dateparser.parse(date)
+        
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "FontArticleMainTitle"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+# %%
+def lanationbenininfo_story(soup):
+    """
+    Function to pull the information we want from Lanationbenin.info stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time')
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1')
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+# %%  
+def lanouvelletribuneinfo_story(soup):
+    """
+    Function to pull the information we want from Lanouvelletribune.info stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "content-inner"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "jeg_post_title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+# %%  
+def capitalethiopiacom_story(soup):
+    """
+    Function to pull the information we want from Capitalethiopia.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "td-post-content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time')
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+#This function is not working properly...
+def ethiopianreportercom_story(soup):
+    """
+    Function to pull the information we want from Ethiopianreporter.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #date
+    try:
+        article_date = soup.find('span',attrs={"class": "post-created"})
+        print(article_date)
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+#%% 
+def ambebige_story(soup):
+    """
+    Function to pull the information we want from Ambebi.ge stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "article_content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    return hold_dict
+
+#%%  
+def georgiatodayge_story(soup):
+    """
+    Function to pull the information we want from Georgiatoday.ge stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "news-data"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "news-data"})
+        date = article_date.div.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+    
+#%%
+def nationcoke_story(soup):
+    """
+    Function to pull the information we want from Nation.co.ke stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('section', attrs={"class": "body-copy"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def standardmediacoke_story(soup):
+    """
+    Function to pull the information we want from Standardmedia.co.ke stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "content"})
+        maintext = article_body.text.strip()
+        hold_dict['maintext'] = maintext
+    except:
+        article_body = None
+    try:
+        article_date = soup.find('div', attrs={"class": "icon-bar"})
+        content = article_date.find('p')
+        unwanted = content.find('span')
+        unwanted.extract()
+        date = " ".join(content.text.strip().split(" ")[:3])
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+#%%
+def businesstodaycoke_story(soup):
+    """
+    Function to pull the information we want from Businesstoday.co.ke stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"data-role": "article_content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        maintext.pop()
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None   
+    #title
+    try:
+        article_title = soup.find('span', attrs={"class":"entry-title-primary"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def thestarcoke_story(soup):
+    """
+    Function to pull the information we want from The-star.co.ke stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "text"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "article-published"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
     return hold_dict
     
 # %%  
@@ -216,11 +476,21 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://beninwebtv.com/2020/07/sessime-son-acerbe-replique-a-une-internaute-qui-choque-les-fans-photo/'
+url = 'https://www.the-star.co.ke/news/2020-07-21-uhuru-maraga-tiff-likely-over-lsk-call-not-to-list-24-in-roll-of-senior-counsel/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
-# %%  
-text= beninwebtv_story(soup)
 
-# %%
+# %%  
+text= thestarcoke_story(soup)
+
+#%%
+def getUrlforDomain(domain):
+    urls = db.articles.count_documents(
+        {
+            'source_domain': domain
+        }
+    )
+    return urls
+
+urls = getUrlforDomain("the-star.co.ke")
