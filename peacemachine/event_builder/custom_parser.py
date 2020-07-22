@@ -42,9 +42,8 @@ def checkForMissingValues(filename):
 
     return hold_dict
     
-
-#%%  
-missing_data = checkForMissingValues('../../../domains/domains_Kenya.txt')
+#%%
+missing_data = checkForMissingValues('../domains/domains_Kosovo.txt')
 
 
 # %%
@@ -469,20 +468,394 @@ def thestarcoke_story(soup):
     except:
         article_date = None
     return hold_dict
-    
+
+#%%    
+def extraec_story(soup):
+    """
+    Function to pull the information we want from Extra.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find_all('p', attrs={"class": "paragraph"})
+        maintext = [para.text for para in article_body]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def eluniversocom_story(soup):
+    """
+    Function to pull the information we want from Eluniverso.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"id": "content", "class": "column"})
+        body = article_body.find('div', attrs={"class": "field-name-body"})
+        maintext = [para.text for para in body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"id": "content", "class": "column"})
+        date = article_date.find('span', attrs={"class": "field-content"}).text.split("-")[0]
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+      
+#%%
+def elcomerciocom_story(soup):
+    """
+    Function to pull the information we want from Elcomercio.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "paragraphs"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "date"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+# %%
+def eltelegrafocom_story(soup):
+    """
+    Function to pull the information we want from Eltelegrafo.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content clearfix"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"class": "entry-meta-date updated"})
+        date = article_date.a.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+#%%
+def lahoracomec_story(soup):
+    """
+    Function to pull the information we want from Lahora.com.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "row contentArticulo"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "headerArticulo"})
+        date = article_date.h3.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    #title
+    try:
+        article_title = soup.find('div', attrs={"class": "headerArticulo"})
+        hold_dict['title'] = article_title.h1.text
+    except:
+        article_title = None
+    return hold_dict
+
 # %%  
+def expresoec_story(soup):
+    """
+    Function to pull the information we want from Expreso.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "content-modules-container"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def diarioqueec_story(soup):
+    """
+    Function to pull the information we want from Diarioque.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "small-12 columns content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    return hold_dict
+    
+#%%
+def eltiempocom_story(soup):
+    """
+    Function to pull the information we want from Eltiempo.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        maintext = [para.text for para in soup.find_all('p', attrs={"class": "contenido"})]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"class": "fecha"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def lagacetacomec_story(soup):
+    """
+    Function to pull the information we want from Lagaceta.com.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "td-post-content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date updated td-module-date"})
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None   
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class":"entry-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+    
+#%%
+def elnorteec_story(soup):
+    """
+    Function to pull the information we want from Elnorte.ec stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext)
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def gazetaexpresscom_story(soup):
+    """
+    Function to pull the information we want from Gazetaexpress.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "single__content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def kosovapresscom_story(soup):
+    """
+    Function to pull the information we want from Kosovapress.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"class": "date meta-item"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+   
+#%%
+def kohanet_story(soup):
+    """
+    Function to pull the information we want from Koha.net stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "news-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        maintext.pop()
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+        
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time')
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    #title
+    try:
+        article_title = soup.find('h1')
+        hold_dict['title'] = article_title.text.strip(u'\u200b')
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def botasotinfo_story(soup):
+    """
+    Function to pull the information we want from Botasot.info stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "paragraph-holder"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class":"img-auth"})
+        date = article_date.span.text
+        date = " ".join(date[date.find("Më"):].split(" ")[1:4])
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    #title
+    try:
+        article_title = soup.find('h1')
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def epokaerecom_story(soup):
+    """
+    Function to pull the information we want from Epokaere.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('main', attrs={"class": "article__main"})
+        maintext = [para.text for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "datetime_holder"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def kosovasotinfo_story(soup):
+    """
+    Function to pull the information we want from Kosova-sot.info stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "news-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        maintext.pop(0)
+        maintext.pop()
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+        
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('ul', attrs={"class": "published-info"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_title = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class":"main-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+    
+#%%
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.the-star.co.ke/news/2020-07-21-uhuru-maraga-tiff-likely-over-lsk-call-not-to-list-24-in-roll-of-senior-counsel/'
+url = 'https://www.kosova-sot.info/opinione/480273/kreu-i-shtetit-i-dyshuar-nga-gjykata-speciale-politika-e-jashtme-ne-kolaps/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
-
 # %%  
-text= thestarcoke_story(soup)
+text= kosovasotinfo_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -493,4 +866,7 @@ def getUrlforDomain(domain):
     )
     return urls
 
-urls = getUrlforDomain("the-star.co.ke")
+urls = getUrlforDomain("kosova-sot.info")
+
+
+# %%
