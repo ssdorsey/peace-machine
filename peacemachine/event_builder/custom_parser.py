@@ -1049,7 +1049,7 @@ def alakhbarpressma_story(soup):
     try:
         article_date = soup.find('span', attrs={"class":"date meta-item fa-before"})
         date = article_date.text
-        hold_dict['date'] = dateparser(date)
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
     #title
@@ -1079,7 +1079,7 @@ def assabahma_story(soup):
     try:
         article_date = soup.find('span', attrs={"class":"date meta-item fa-before"})
         date = article_date.text
-        hold_dict['date'] = dateparser(date)
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
     #title
@@ -1107,7 +1107,7 @@ def leconomistecom_story(soup):
     try:
         article_date = soup.find('div', attrs={"class":"author"})
         date = article_date.text.split("|")[1].strip().split(" ")[-1]
-        hold_dict['date'] = dateparser(date, date_formats=['%d/%m/%Y'])
+        hold_dict['date'] = dateparser.parse(date, date_formats=['%d/%m/%Y'])
     except:
         article_date = None
     #title
@@ -1137,7 +1137,7 @@ def aminiyadailytrustcomng_story(soup):
         article_date = soup.find('div', attrs={"class":"article_headline__yVgYO"})
         date = article_date.find('div', attrs={"class":"article_date__33NGW"})
         date = date.div.text
-        hold_dict['date'] = dateparser(date, settings={'RETURN_AS_TIMEZONE_AWARE':True})
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
     return hold_dict
@@ -1160,7 +1160,7 @@ def businessnewscomng_story(soup):
     try:
         article_date = soup.find('div', attrs={"id":"post-info"})
         date = article_date.text[article_date.text.find("on")+2:].strip()
-        hold_dict['date'] = dateparser(date, date_formats=['%B %d, %Y'])
+        hold_dict['date'] = dateparser.parse(date)
     except:
         article_date = None
     #title
@@ -1172,17 +1172,138 @@ def businessnewscomng_story(soup):
     return hold_dict
     
 #%%
+def sunnewsonlinecom_story(soup):
+    """
+    Function to pull the information we want from Sunnewsonline.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "content-inner"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class":"jeg_meta_date"})
+        date = article_date.text.replace("th","").strip()
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "jeg_post_title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+    
+#%%
+def guardianng_story(soup):
+    """
+    Function to pull the information we want from Guardian.ng stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "single-article-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class":"manual-age single-article-datetime"})
+        date = article_date.text.strip().split("|")[0]
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+#%%
+def nationaldailyngcom_story(soup):
+    """
+    Function to pull the information we want from Nationaldailyng.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "td-post-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time')
+        date = article_date['datetime']
+        
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def punchngcom_story(soup):
+    """
+    Function to pull the information we want from Punchng.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')][:-3]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
+#%%
+def vanguardngrcom_story(soup):
+    """
+    Function to pull the information we want from Vanguardngr.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text
+    except:
+        article_title = None
+    return hold_dict
+
+
+#%%
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'http://businessnews.com.ng/2018/08/01/fcmb-bank-uk-limited-launches-personal-and-business-banking-proposition-to-deepen-inclusiveness/'
+url = 'https://www.vanguardngr.com/2020/04/returnees-from-kano-lagos-must-be-quarantine-gov-sule/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= businessnewscomng_story(soup)
+text= vanguardngrcom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -1193,7 +1314,13 @@ def getUrlforDomain(domain):
     )
     return urls
 
-urls = getUrlforDomain("businessnews.com.ng")
+urls = getUrlforDomain("vanguardngr.com")
 
+#%%
+missing_urls = [i['url'] for i in db.articles.find(
+        {
+            'source_domain': 'vanguardngr.com',
+            '$or': [{'maintext': None}, {'title': None}, {'date_publish':None}]
+        }
+    )]
 
-# %%
