@@ -43,7 +43,7 @@ def checkForMissingValues(filename):
     return hold_dict
     
 #%%
-missing_data1 = checkForMissingValues('../../../domains/domains_Serbia.txt')
+missing_data1 = checkForMissingValues('../../../domains/domains_Colombia.txt')
 
 
 # %%
@@ -2024,19 +2024,91 @@ def istinomerrs_story(soup):
     
 #%%
 def astrars_story(soup):
-    pass
+    """
+    Function to pull the information we want from Astra.rs stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "text"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        text = ', '.join(maintext).strip()
+        hold_dict['maintext'] = '\n'.join(text.split(",")[1:])
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+def pescaniknet_story(soup):
+    """
+    Function to pull the information we want from Pescanik.net stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"class": "asdf-post-date"})
+        date = article_date.text
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text.strip()
+    except:
+        article_title = None
+    return hold_dict
+
+#%%
+def cenzolovkars_story(soup):
+    """
+    Function to pull the information we want from Cenzolovka.rs stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "entry-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        date = article_date['datetime']
+        hold_dict['date'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "entry-title"})
+        hold_dict['title'] = article_title.text.strip()
+    except:
+        article_title = None
+    return hold_dict
+
 #%%  
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://vesti.istinomer.rs/vesti/2019/07/06/razvojni-put-vladinog-sluzbenika-iz-nvo-sektora/'
+url = 'https://www.cenzolovka.rs/drzava-i-mediji/pohvale-za-dosadasnji-napredak-2/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= istinomerrs_story(soup)
+text= cenzolovkars_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2047,7 +2119,7 @@ def getUrlforDomain(domain):
     )
     return urls
 
-urls = getUrlforDomain("astra.rs")
+urls = getUrlforDomain("cenzolovka.rs")
 
 #%%
 duplicates = db.articles.aggregate([
@@ -2066,11 +2138,13 @@ duplicates = db.articles.aggregate([
 #%%
 missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'astra.rs',
+            'source_domain': 'cenzolovka.rs',
             '$or': [{'maintext': None}, {'title': None}, {'date_publish':None}],
         }
     ).sort('date_publish',-1).limit(500)]
 
 
 
+# %%
+missing_url_date
 # %%
