@@ -1841,6 +1841,19 @@ def danasrs_story(soup):
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
         article_body = None
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        date = article_date['datetime']
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "post-title"})
+        hold_dict['title'] = article_title.text.strip()
+    except:
+        article_title = None
     return hold_dict
 
 #%%
@@ -2415,12 +2428,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'http://rs.n1info.com/Vesti/a582753/Sta-treba-znati-o-respiratornim-komplikacijama-infekcije-koronavirusom-COVID-19.html'
+url = 'https://www.danas.rs/politika/dacic-dobri-odnosi-sa-sijera-leoneom/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= rsn1infocom_story(soup)
+text= danasrs_story(soup)
 
 #%%
 def getUrlforDomain(domain):
