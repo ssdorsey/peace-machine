@@ -1930,6 +1930,19 @@ def juznevesticom_story(soup):
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
         article_body = None
+    #date
+    try:
+        article_date = soup.find('p', attrs={"class": "article--single__date"})
+        date = article_date.text
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "mb10 title title--1"})
+        hold_dict['title'] = article_title.text.strip()
+    except:
+        article_title = None
     return hold_dict
 
 #%% 
@@ -2428,12 +2441,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.danas.rs/politika/dacic-dobri-odnosi-sa-sijera-leoneom/'
+url = 'https://www.juznevesti.com/Politika/Prokupacki-naprednjaci-mogu-sami-da-formiraju-vlast-socijalisti-cekaju-poziv.sr.html'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= danasrs_story(soup)
+text= juznevesticom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2464,7 +2477,7 @@ duplicates = db.articles.aggregate([
 #%%
 missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'rutasdelconflicto.com',
+            'source_domain': 'old.kosovopress.com',
             '$or': [{'maintext': None}, {'title': None}, {'date_publish':None}],
         }
     ).sort('date_publish',-1).limit(500)]
