@@ -1803,25 +1803,21 @@ def rsn1infocom_story(soup):
     hold_dict = {}
     #text
     try:
-        unwanted = soup.find('div', attrs={"class": "danas-club"})
-        unwanted.extract()
-        article_body = soup.find('div', attrs={"class": "post-intro-content content"})
-        maintext = [article_body.p.text.strip()]
-        article_body = soup.find('div', attrs={"class": "post-content content"})
-        maintext+= [para.text.strip() for para in article_body.find_all('p')]
+        article_body = soup.find('div', attrs={"id": "articleContent"})
+        maintext= [para.text.strip() for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
         article_body = None
     #date
     try:
-        article_date = soup.find('span', attrs={"class": "post-meta date-time"})
-        date = article_date.time['datetime']
+        article_date = soup.find('time', attrs={"class": "pub-date"})
+        date = article_date['datetime']
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
     #title
     try:
-        article_title = soup.find('h1', attrs={"class": "post-title"})
+        article_title = soup.find('h1', attrs={"class": "single-article-title"})
         hold_dict['title'] = article_title.text.strip()
     except:
         article_title = None
@@ -2419,12 +2415,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.laorejaroja.com/el-21n-no-tiene-marcha-atras/'
+url = 'http://rs.n1info.com/Vesti/a582753/Sta-treba-znati-o-respiratornim-komplikacijama-infekcije-koronavirusom-COVID-19.html'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= laorejarojacom_story(soup)
+text= rsn1infocom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
