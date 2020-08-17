@@ -2108,7 +2108,6 @@ def cenzolovkars_story(soup):
     try:
         article_date = soup.find('time', attrs={"class": "entry-date published"})
         date = article_date.text
-        print(date)
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
