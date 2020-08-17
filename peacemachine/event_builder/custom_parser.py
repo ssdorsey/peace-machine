@@ -2107,7 +2107,8 @@ def cenzolovkars_story(soup):
     #date
     try:
         article_date = soup.find('time', attrs={"class": "entry-date published"})
-        date = article_date['datetime']
+        date = article_date.text
+        print(date)
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
@@ -2441,12 +2442,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'http://old.kosovapress.com/sq/lajme/shqiperia-rezultate-ne-proceset-kyce-te-negociatave-201237/'
+url = 'https://www.cenzolovka.rs/english/amnesty-urges-serbia-to-drop-probe-into-critical-ngos/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= kosovapresscom_story(soup)
+text= cenzolovkars_story(soup)
 
 #%%
 def getUrlforDomain(domain):
