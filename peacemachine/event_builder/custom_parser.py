@@ -704,22 +704,22 @@ def kosovapresscom_story(soup):
     hold_dict = {}
     #text
     try:
-        article_body = soup.find('div', attrs={"class": "entry-content"})
+        article_body = soup.find('div', attrs={"id": "main-content"})
         maintext = [para.text for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
         article_body = None
     #date
     try:
-        article_date = soup.find('span', attrs={"class": "date meta-item"})
-        date = article_date.text
+        article_date = soup.find('div', attrs={"class": "article_title"})
+        date = article_date.p.text.split("|")[1].strip()
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
     #title
     try:
-        article_title = soup.find('h1', attrs={"class": "entry-title"})
-        hold_dict['title'] = article_title.text
+        article_title = soup.find('div', attrs={"class": "article_title"})
+        hold_dict['title'] = article_title.h2.text
     except:
         article_title = None
     return hold_dict
@@ -2441,12 +2441,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.juznevesti.com/Politika/Prokupacki-naprednjaci-mogu-sami-da-formiraju-vlast-socijalisti-cekaju-poziv.sr.html'
+url = 'http://old.kosovapress.com/sq/lajme/shqiperia-rezultate-ne-proceset-kyce-te-negociatave-201237/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= juznevesticom_story(soup)
+text= kosovapresscom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2457,7 +2457,7 @@ def getUrlforDomain(domain):
     )
     return count
 
-count = getUrlforDomain("rutasdelconflicto.com")
+count = getUrlforDomain("kosovapress.com")
 print(count)
 
 #%%
@@ -2477,7 +2477,7 @@ duplicates = db.articles.aggregate([
 #%%
 missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'old.kosovopress.com',
+            'source_domain': 'kosovapress.com',
             '$or': [{'maintext': None}, {'title': None}, {'date_publish':None}],
         }
     ).sort('date_publish',-1).limit(500)]
