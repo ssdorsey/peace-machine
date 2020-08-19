@@ -43,7 +43,7 @@ def checkForMissingValues(filename):
     return hold_dict
     
 #%%
-missing_data = checkForMissingValues('../../../domains/domains_Colombia.txt')
+missing_data = checkForMissingValues('../../../domains/domains_international.txt')
 
 
 # %%
@@ -2435,18 +2435,37 @@ def laorejarojacom_story(soup):
         article_body = None
     return hold_dict
 
+#%%
+def theguardiancom_story(soup):
+    """css-rtdfvncss-rxpjzd
+    Function to pull the information we want from Theguardian.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "block block--content"})
+        text = article_body.find('div', attrs={"itemprop": "articleBody"})
+        maintext = maintext = [para.text.strip() for para in text.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    return hold_dict
+
+#%%
+
 #%%  
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.cenzolovka.rs/english/amnesty-urges-serbia-to-drop-probe-into-critical-ngos/'
+url = 'https://www.theguardian.com/business/live/2020/jul/10/england-reopens-gyms-pools-nail-bars-tattoo-covid-19-lockdown-eases-stocks-china-outbreak-business-live'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= cenzolovkars_story(soup)
+text= theguardiancom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2457,7 +2476,7 @@ def getUrlforDomain(domain):
     )
     return count
 
-count = getUrlforDomain("kosovapress.com")
+count = getUrlforDomain("apnews.com")
 print(count)
 
 #%%
@@ -2477,13 +2496,13 @@ duplicates = db.articles.aggregate([
 #%%
 missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'kosovapress.com',
-            '$or': [{'maintext': None}, {'title': None}, {'date_publish':None}],
+            'source_domain': 'bbc.com',
+            '$or': [{'maintext': {'$type': 'null'}}, {'title': {'$type': 'null'}}, {'date_publish': {'$type': 'null'}}],
         }
     ).sort('date_publish',-1).limit(500)]
 
 
 
 # %%
-missing_url_date[1:50]
+missing_url_date[300:400]
 # %%
