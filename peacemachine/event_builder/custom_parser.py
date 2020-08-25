@@ -1865,24 +1865,22 @@ def insajdernet_story(soup):
     hold_dict = {}
     #text
     try:
-        article_body = soup.find_all('div', attrs={"class": "article-content"})
-        maintext = []
-        for div in article_body:
-            maintext+= [para.text.strip() for para in div.find_all('p')]
+        article_body = soup.find('div', attrs={"class": "articleView__text"})
+        maintext= [para.text.strip() for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
         article_body = None
     #date
     try:
-        article_date = soup.find('div', attrs={"class": "byline"})
-        date = article_date.time['datetime']
+        article_date = soup.find('time', attrs={"class": "articleBadge"})
+        date = article_date['datetime']
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
     #title
     try:
-        article_title = soup.find('article', attrs={"role": "article"})
-        hold_dict['title'] = article_title.h1.text.strip()
+        article_title = soup.find('h1', attrs={"class": "articleView__headline"})
+        hold_dict['title'] = article_title.text.strip()
     except:
         article_title = None
     return hold_dict
@@ -2460,12 +2458,12 @@ header = {
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://www.theguardian.com/business/live/2020/jul/10/england-reopens-gyms-pools-nail-bars-tattoo-covid-19-lockdown-eases-stocks-china-outbreak-business-live'
+url = 'https://insajder.net/sr/sajt/vazno/19547/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= theguardiancom_story(soup)
+text= insajdernet_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2496,7 +2494,7 @@ duplicates = db.articles.aggregate([
 #%%
 missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'bbc.com',
+            'source_domain': 'insajder.net',
             '$or': [{'maintext': {'$type': 'null'}}, {'title': {'$type': 'null'}}, {'date_publish': {'$type': 'null'}}],
         }
     ).sort('date_publish',-1).limit(500)]
