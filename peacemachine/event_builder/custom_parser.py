@@ -1794,6 +1794,7 @@ def wzlvivua_story(soup):
         article_title = None
     return hold_dict
 
+###Serbia Domains
 #%%
 def rsn1infocom_story(soup):
     """
@@ -1843,7 +1844,7 @@ def danasrs_story(soup):
         article_body = None
     #date
     try:
-        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        article_date = soup.find('time')
         date = article_date['datetime']
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
@@ -2451,19 +2452,45 @@ def theguardiancom_story(soup):
     return hold_dict
 
 #%%
-
+def lafmcomco_story(soup):
+    """
+    Function to pull the information we want from Lafm.com.co stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "node-content"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class": "node-date"})
+        date = article_date.text
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('h1', attrs={"class": "node__title"})
+        hold_dict['title'] = article_title.text.strip()
+    except:
+        article_title = None
+    return hold_dict
 #%%  
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
 
-url = 'https://insajder.net/sr/sajt/vazno/19547/'
+url = 'http://rs.n1info.com/Vesti/a625594/Jos-jedna-osoba-preminula-u-Kraljevu-34-novozarazenih.html'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= insajdernet_story(soup)
+text= rsn1infocom_story(soup)
 
 #%%
 def getUrlforDomain(domain):
@@ -2474,33 +2501,42 @@ def getUrlforDomain(domain):
     )
     return count
 
-count = getUrlforDomain("apnews.com")
+count = getUrlforDomain("lafm.com.co")
 print(count)
 
 #%%
-duplicates = db.articles.aggregate([
-    {
-    'source_domain' : 'insajder.net',
-    },
-    {
-        '$group': {
-            title: '$title',
-            count: {'$sum': 1}
-        }
-    },
-    {   '$sort': {count: -1}
-    }
-])
-#%%
-missing_url_date = [(i['date_publish'],i['url']) for i in db.articles.find(
+missing_maintext = [(i['date_publish'],i['maintext']) for i in db.articles.find(
         {
-            'source_domain': 'insajder.net',
-            '$or': [{'maintext': {'$type': 'null'}}, {'title': {'$type': 'null'}}, {'date_publish': {'$type': 'null'}}],
+            'source_domain': 'rs.n1info.com',
+            'url' : 'http://rs.n1info.com/Vesti/a624950/Zvanicno-preminulo-jos-sedmoro-321-novozarazeni.html'
         }
     ).sort('date_publish',-1).limit(500)]
+missing_maintext
+#%%
+missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
+        {
+            'source_domain': 'danas.rs',
+            '$or': [{'maintext': {'$type': 'null'}}, {'title': {'$type': 'null'}}, {'date_publish': {'$type': 'null'}}]
+        }
+    ).sort('date_publish',-1).limit(500)]
+missing_url[0:100]
+#%%
+# db.sales.aggregate([
+#   # First Stage
+#   {
+#     $match : {
+#     'source_domain' : 'rs.n1info.com'
+#     }
+#   },
+#   # Second Stage
+#   {
+#     $group : {
+#         _id: {
+#             $dateToString: { format: "%Y-%m", date: "$date_publish" }
+#         },
+#         count: {$sum : 1}
+        
+#     }
+#   }
+#  ])
 
-
-
-# %%
-missing_url_date[300:400]
-# %%
