@@ -10,7 +10,6 @@ import requests
 from urllib.parse import quote_plus
 from pprint import pprint
 import os
-
 #%%
 db = MongoClient('mongodb://akankshanb:HavanKarenge123@vpn.ssdorsey.com:27017/ml4p').ml4p
 
@@ -43,7 +42,7 @@ def checkForMissingValues(filename):
     return hold_dict
     
 #%%
-missing_data = checkForMissingValues('../../../domains/domains_international.txt')
+# missing_data = checkForMissingValues('../../../domains/domains_international.txt')
 
 
 # %%
@@ -2479,19 +2478,48 @@ def lafmcomco_story(soup):
     except:
         article_title = None
     return hold_dict
+
+#%%
+def apnewscom_story(soup):
+    """
+    Function to pull the information we want from Apnews.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "Article"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"data-key": "timestamp"})
+        date = article_date['data-source']
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('div', attrs={"data-key": "card-headline"})
+        hold_dict['title'] = article_title.h1.text.strip()
+    except:
+        article_title = None
+    return hold_dict
+    
 #%%  
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
         '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
         }
-
-url = 'http://rs.n1info.com/Vesti/a625594/Jos-jedna-osoba-preminula-u-Kraljevu-34-novozarazenih.html'
+url = 'https://apnews.com/7733ba98001cc18cd26cc78fc83615a8'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= rsn1infocom_story(soup)
-
+text= apnewscom_story(soup)
+text
 #%%
 def getUrlforDomain(domain):
     count = db.articles.count_documents(
@@ -2501,24 +2529,26 @@ def getUrlforDomain(domain):
     )
     return count
 
-count = getUrlforDomain("lafm.com.co")
-print(count)
+# count = getUrlforDomain("lafm.com.co")
+# print(count)
 
 #%%
-missing_maintext = [(i['date_publish'],i['maintext']) for i in db.articles.find(
+missing_maintext = [i for i in db.articles.find(
         {
-            'source_domain': 'rs.n1info.com',
-            'url' : 'http://rs.n1info.com/Vesti/a624950/Zvanicno-preminulo-jos-sedmoro-321-novozarazeni.html'
+            # 'source_domain': 'apnews.com',
+            'url' : 'https://apnews.com/7733ba98001cc18cd26cc78fc83615a8'
         }
-    ).sort('date_publish',-1).limit(500)]
+    )]
 missing_maintext
 #%%
 missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'danas.rs',
-            '$or': [{'maintext': {'$type': 'null'}}, {'title': {'$type': 'null'}}, {'date_publish': {'$type': 'null'}}]
+            'source_domain': 'apnews.com',
+            'maintext': {'$type': 'null'}
+            # 'url' : { '$regex': '^(http://archive.balkaninsight.com)(/\w+)+$'}
         }
     ).sort('date_publish',-1).limit(500)]
+#%%
 missing_url[0:100]
 #%%
 # db.sales.aggregate([
