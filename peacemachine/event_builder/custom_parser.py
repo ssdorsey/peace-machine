@@ -42,7 +42,7 @@ def checkForMissingValues(filename):
     return hold_dict
     
 #%%
-# missing_data = checkForMissingValues('../../../domains/domains_international.txt')
+missing_data = checkForMissingValues('../../../domains/domains_international.txt')
 
 
 # %%
@@ -2507,7 +2507,35 @@ def apnewscom_story(soup):
     except:
         article_title = None
     return hold_dict
-    
+
+#%%
+def bloombergcom_story(soup):
+    """
+    Function to pull the information we want from Bloomberg.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #text
+    try:
+        article_body = soup.find('div', attrs={"class": "Article"})
+        maintext = [para.text.strip() for para in article_body.find_all('p')]
+        hold_dict['maintext'] = '\n '.join(maintext).strip()
+    except:
+        article_body = None
+    #date
+    try:
+        article_date = soup.find('span', attrs={"data-key": "timestamp"})
+        date = article_date['data-source']
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    #title
+    try:
+        article_title = soup.find('div', attrs={"data-key": "card-headline"})
+        hold_dict['title'] = article_title.h1.text.strip()
+    except:
+        article_title = None
+    return hold_dict
 #%%  
 header = {
         'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
@@ -2529,25 +2557,25 @@ def getUrlforDomain(domain):
     )
     return count
 
-# count = getUrlforDomain("lafm.com.co")
-# print(count)
+count = getUrlforDomain("lafm.com.co")
+print(count)
 
 #%%
 missing_maintext = [i for i in db.articles.find(
         {
-            # 'source_domain': 'apnews.com',
-            'url' : 'https://apnews.com/7733ba98001cc18cd26cc78fc83615a8'
+            'source_domain': 'wsj.com',
+            'url' : 'https://www.wsj.com/articles/pompeo-urges-arab-states-to-follow-u-a-e-in-striking-deals-with-israel-11598274225'
         }
     )]
 missing_maintext
 #%%
 missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'apnews.com',
-            'maintext': {'$type': 'null'}
-            # 'url' : { '$regex': '^(http://archive.balkaninsight.com)(/\w+)+$'}
+            'source_domain': 'wsj.com'
+            # 'maintext': {'$type': 'null'}
+            # 'url' : { '$regex': '^(https://www.bbc.com/news/world-europe)'}
         }
-    ).sort('date_publish',-1).limit(500)]
+    ).sort('date_publish',-1).limit(1000)]
 #%%
 missing_url[0:100]
 #%%
@@ -2570,3 +2598,38 @@ missing_url[0:100]
 #   }
 #  ])
 
+#%%
+import pandas as pd
+#%%
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/dw.csv')
+urls = df['URL']
+source = 'dw.com'
+# domains = df['domain']
+# print(urls)
+# print(domains)
+missing = []
+item = []
+for url in urls:
+    data = [i for i in db.articles.find(
+        {
+            'source_domain': source,
+            'url' : url
+        }
+    )]
+    if len(data)==0:
+        missing.append(url)
+    else:
+        item.append(data)
+#%%
+path = '/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/missing_url.csv'
+df1 = pd.read_csv(path)
+df2 = pd.DataFrame(columns = ['domain', 'missing_url']) 
+df2['missing_url'] = missing
+l = [source]*len(missing)
+df2['domain'] = l
+df3 = df1.append(df2,ignore_index=True)
+df3.to_csv(path, index=False)
+# %%
+l = [(i[0]['url'],i[0]['maintext']) for i in item]
+
+# %%
