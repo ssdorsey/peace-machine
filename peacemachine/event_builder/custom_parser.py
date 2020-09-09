@@ -2537,10 +2537,11 @@ def bloombergcom_story(soup):
         article_title = None
     return hold_dict
 #%%  
-header = {
-        'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'
-        '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')
-        }
+
+
+
+
+
 url = 'https://apnews.com/6418e65716d18fae10d28108f9e5b049'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
@@ -2563,21 +2564,21 @@ print(count)
 #%%
 missing_maintext = [i for i in db.articles.find(
         {
-            'source_domain': 'wsj.com',
-            'url' : 'https://www.wsj.com/articles/pompeo-urges-arab-states-to-follow-u-a-e-in-striking-deals-with-israel-11598274225'
+            'source_domain': 'aljazeera.com',
+            'url' : 'https://www.aljazeera.com/news/2019/05/serbian-troops-alert-kosovo-police-arrests-190528084447547.html'
         }
     )]
 missing_maintext
 #%%
 missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'wsj.com'
+            'source_domain': 'apnews.com',
             # 'maintext': {'$type': 'null'}
-            # 'url' : { '$regex': '^(https://www.bbc.com/news/world-europe)'}
+            # 'url' : { '$regex': '^(https://apnews.com/apf-intlnews)'}
         }
     ).sort('date_publish',-1).limit(1000)]
 #%%
-missing_url[0:100]
+missing_url[1:100]
 #%%
 # db.sales.aggregate([
 #   # First Stage
@@ -2601,9 +2602,9 @@ missing_url[0:100]
 #%%
 import pandas as pd
 #%%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/dw.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/insajder.csv')
 urls = df['URL']
-source = 'dw.com'
+source = 'insajder.net'
 # domains = df['domain']
 # print(urls)
 # print(domains)
@@ -2629,7 +2630,33 @@ l = [source]*len(missing)
 df2['domain'] = l
 df3 = df1.append(df2,ignore_index=True)
 df3.to_csv(path, index=False)
-# %%
+# %%z
 l = [(i[0]['url'],i[0]['maintext']) for i in item]
 
+# %%
+from newsplease import NewsPlease
+#%%
+path = '/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/missing_url.csv'
+df = pd.read_csv(path)
+urls = df['missing_url']
+articles = NewsPlease.from_urls(urls)
+content = []
+for val in articles.values():
+    content.append(val.get_dict())
+
+#%%
+ptext = []
+for val in articles.values():
+    ptext.append([val.url, val.maintext])
+
+# %%
+import csv
+new_file = '/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/procured.csv'
+with open(new_file, 'w') as f:
+    writer = csv.writer(f)
+    for v in ptext:
+        writer.writerow(v)
+
+# %%
+article = NewsPlease.from_url('https://insajder.net/sr/sajt/vazno/19277/')
 # %%
