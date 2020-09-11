@@ -2537,11 +2537,6 @@ def bloombergcom_story(soup):
         article_title = None
     return hold_dict
 #%%  
-
-
-
-
-
 url = 'https://apnews.com/6418e65716d18fae10d28108f9e5b049'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
@@ -2564,17 +2559,17 @@ print(count)
 #%%
 missing_maintext = [i for i in db.articles.find(
         {
-            'source_domain': 'aljazeera.com',
-            'url' : 'https://www.aljazeera.com/news/2019/05/serbian-troops-alert-kosovo-police-arrests-190528084447547.html'
+            'source_domain': 'balkaninsight.com',
+            'title' : { '$regex': 'Serbia Sentences Convicted Drugs'}
         }
     )]
 missing_maintext
 #%%
 missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'apnews.com',
+            'source_domain': 'insajder.net',
             # 'maintext': {'$type': 'null'}
-            # 'url' : { '$regex': '^(https://apnews.com/apf-intlnews)'}
+            'url' : { '$regex': '(https://insajder.net/sr/sajt/vazno/19277/)'}
         }
     ).sort('date_publish',-1).limit(1000)]
 #%%
@@ -2602,9 +2597,9 @@ missing_url[1:100]
 #%%
 import pandas as pd
 #%%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/insajder.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/balkaninsight.csv')
 urls = df['URL']
-source = 'insajder.net'
+source = 'balkaninsight.com'
 # domains = df['domain']
 # print(urls)
 # print(domains)
@@ -2630,7 +2625,7 @@ l = [source]*len(missing)
 df2['domain'] = l
 df3 = df1.append(df2,ignore_index=True)
 df3.to_csv(path, index=False)
-# %%z
+# %%
 l = [(i[0]['url'],i[0]['maintext']) for i in item]
 
 # %%
@@ -2659,4 +2654,24 @@ with open(new_file, 'w') as f:
 
 # %%
 article = NewsPlease.from_url('https://insajder.net/sr/sajt/vazno/19277/')
+# %%
+#Out of 426 I checked till now, I could procure 398
+
+s = 'https://balkaninsight.com/2019/11/07/kosovo-final-election-result-confirms-vetevendosje-victory/'
+print(s[8:])
+# %%
+sample = []
+extra = []
+souce = 'balkaninsight.com'
+for url in missing:
+    data = [i for i in db.articles.find(
+        {
+            'source_domain': source,
+            'url' : {'$regex' : url[8:]}
+        }
+    )]
+    if len(data)==0:
+        sample.append(url)
+    else:
+        extra.append(data)
 # %%
