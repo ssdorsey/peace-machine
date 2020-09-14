@@ -88,11 +88,11 @@ def match_title(still_missing, source):
     return item, missing
 
 # %%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/balkaninsight.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/insajder.csv')
 df = df.dropna(subset=['URL'])
 urls = df['URL']
 titles = df['Title']
-source = 'balkaninsight.com'
+source = 'insajder.net'
 
 item, missing = get_data(urls, titles, source)
 modified = modify_url(missing)
