@@ -96,7 +96,7 @@ def gazetashqiptareal_story(soup):
     try:
         article_body = soup.find('div', attrs={"class":"content_right"})
         unwanted = article_body.find('div', attrs={"class": "comment_section block_section"})
-        unwanted.extract()
+        if unwanted: unwanted.extract()
         maintext = [para.text.strip() for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext)
     except:
@@ -404,7 +404,7 @@ def standardmediacoke_story(soup):
         article_date = soup.find('div', attrs={"class": "icon-bar"})
         content = article_date.find('p')
         unwanted = content.find('span')
-        unwanted.extract()
+        if unwanted: unwanted.extract()
         date = " ".join(content.text.strip().split(" ")[:3])
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
@@ -1327,7 +1327,7 @@ def adndigitalcompy_story(soup):
     try:
         article_body = soup.find('div', attrs={"class": "entry"})
         unwanted = article_body.find('section', attrs={"id": "related_posts"})
-        unwanted.extract()
+        if unwanted: unwanted.extract()
         maintext = [para.text.strip() for para in article_body.find_all('p')]
         hold_dict['maintext'] = '\n '.join(maintext).strip()
     except:
@@ -1833,7 +1833,7 @@ def danasrs_story(soup):
     #text
     try:
         unwanted = soup.find('div', attrs={"class": "danas-club"})
-        unwanted.extract()
+        if unwanted: unwanted.extract()
         article_body1 = soup.find('div', attrs={"class": "post-intro-content content"})
         maintext = [para.text.strip() for para in article_body1.find_all('p')]
         article_body2 = soup.find('div', attrs={"class": "post-content content"})
@@ -2536,13 +2536,18 @@ def bloombergcom_story(soup):
     except:
         article_title = None
     return hold_dict
-#%%  
-url = 'https://apnews.com/6418e65716d18fae10d28108f9e5b049'
+#%% 
+header = {
+        'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'	        
+        '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')	  
+}
+#%%
+url = 'https://www.danas.rs/drustvo/aleksandar-vucic-pusten-kuci-posle-lecenja-na-vma/'
 response = requests.get(url, headers=header).text
 soup = BeautifulSoup(response)
 
 # %%  
-text= apnewscom_story(soup)
+text= danasrs_story(soup)
 text
 #%%
 def getUrlforDomain(domain):
@@ -2559,21 +2564,21 @@ print(count)
 #%%
 missing_maintext = [i for i in db.articles.find(
         {
-            'source_domain': 'balkaninsight.com',
-            'title' : { '$regex': 'Serbia Sentences Convicted Drugs'}
+            'source_domain': 'danas.rs',
+            'url' : { '$regex': 'https://www.danas.rs/politika/fajon-i-bilcik-u-drugoj-rundi-dijaloga-vlasti-i-opozicije-o-izbornim-uslovima/'}
         }
     )]
 missing_maintext
 #%%
 missing_url = [(i['date_publish'],i['url']) for i in db.articles.find(
         {
-            'source_domain': 'insajder.net',
+            'source_domain': 'themoscowtimes.com'
             # 'maintext': {'$type': 'null'}
-            'url' : { '$regex': '(https://insajder.net/sr/sajt/vazno/19277/)'}
+            # 'url' : { '$regex': '(https://insajder.net/sr/sajt/vazno/19277/)'}
         }
     ).sort('date_publish',-1).limit(1000)]
 #%%
-missing_url[1:100]
+missing_url[700:800]
 #%%
 # db.sales.aggregate([
 #   # First Stage
@@ -2597,9 +2602,9 @@ missing_url[1:100]
 #%%
 import pandas as pd
 #%%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/balkaninsight.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/juznevesti.csv')
 urls = df['URL']
-source = 'balkaninsight.com'
+source = 'juznevesti.com'
 # domains = df['domain']
 # print(urls)
 # print(domains)
@@ -2609,7 +2614,7 @@ for url in urls:
     data = [i for i in db.articles.find(
         {
             'source_domain': source,
-            'url' : url
+            'url' : { '$regex': url}
         }
     )]
     if len(data)==0:
@@ -2653,7 +2658,7 @@ with open(new_file, 'w') as f:
         writer.writerow(v)
 
 # %%
-article = NewsPlease.from_url('https://insajder.net/sr/sajt/vazno/19277/')
+article = NewsPlease.from_url('https://www.danas.rs/drustvo/ruzic-vazni-su-saradnja-i-poverenje/')
 # %%
 #Out of 426 I checked till now, I could procure 398
 
