@@ -118,11 +118,11 @@ def get_text(i, translator):
     return new_dict
 
 # %%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/rsn1info.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/juznevesti.csv')
 df = df.dropna(subset=['URL'])
 urls = df['URL']
 titles = df['Title']
-source = 'rs.n1info.com'
+source = 'juznevesti.com'
 
 item, missing = get_data(urls, titles, source)
 modified = modify_url(missing)
@@ -146,12 +146,13 @@ for i in flatten:
         translated.append(get_text(i, translator))
 
 # %%
-x = [h for h in hold if len(h)>1]
+x = [h['translated_text'] for h in translated]
+
+
+
+#%%
+import json
+with open('/Users/akankshabhattacharyya/Documents/DukePeaceProject/translated.txt','w') as f:
+    for i in x:
+        f.write("%s\n" % i)
 # %%
-translator = Translator()
-
-twoParas = ".".join(result[7]['description'].split("\n")[0:2])
-two_sentences = ".".join(twoParas.split(".")[0:2])
-ttext = translator.translate(two_sentences).text
-ttext
-
