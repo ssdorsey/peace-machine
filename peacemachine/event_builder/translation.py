@@ -118,11 +118,11 @@ def get_text(i, translator):
     return new_dict
 
 # %%
-df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/juznevesti.csv')
+df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/insajder.csv')
 df = df.dropna(subset=['URL'])
 urls = df['URL']
 titles = df['Title']
-source = 'juznevesti.com'
+source = 'insajder.net'
 
 item, missing = get_data(urls, titles, source)
 modified = modify_url(missing)
@@ -145,14 +145,20 @@ for i in flatten:
     else:
         translated.append(get_text(i, translator))
 
+
+# %%
+import csv
+path = '/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/insajder_trans.csv'
+df = pd.DataFrame(columns = ['date_publish', 'description','title','source_domain','maintext','url','translated_text','translated_title']) 
+for i in translated:
+    new_row = {'date_publish': i['date_publish'], 'description': i['description'], 'title':i['title'], 'source_domain': i['source_domain'], 'maintext':i['maintext'],'url':i['url'], 'translated_text':i['translated_text'],'translated_title':i['translated_title']}
+    df = df.append(new_row, ignore_index=True)
+df.to_csv(path, index=False)
+
 # %%
 x = [h['translated_text'] for h in translated]
-
-
-
 #%%
 import json
-with open('/Users/akankshabhattacharyya/Documents/DukePeaceProject/translated.txt','w') as f:
+with open('/Users/akankshabhattacharyya/Documents/DukePeaceProject/translated3.txt','w') as f:
     for i in x:
         f.write("%s\n" % i)
-# %%
