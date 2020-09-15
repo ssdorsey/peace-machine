@@ -88,51 +88,34 @@ def match_title(still_missing, source):
             item.append(data)
     return item, missing
 
-def get_description(not_translated):
+def get_description(i, translator):
     '''
-    :param not_translated: getting info from description tag
-    :param translator: google translator object
+    :param i: input data to be translated
+    :param translator: object
     '''
-    translator = Translator()
-    translated = []
-    still_not_translated = []
-    new_dict = {}
-    for i in not_translated:
-        if i['description'] is None:
-            still_not_translated.append(i)
-        else:
-            two_sentences = ".".join(i['description'].split("\n")[0:2])
-            ttext = translator.translate(two_sentences).text
-            ttitle = translator.translate(i['title']).text
-            new_dict = i
-            new_dict['translated_text'] = ttext
-            new_dict['translated_title'] = ttitle
-            translated.append(new_dict)
-    return translated,still_not_translated
+    new_dict = {} 
+    two_sentences = ".".join(i['description'].split("\n")[0:2])
+    ttext = translator.translate(two_sentences).text
+    ttitle = translator.translate(i['title']).text
+    new_dict = i
+    new_dict['translated_text'] = ttext
+    new_dict['translated_title'] = ttitle
+    return new_dict
 
-def translate_data(inp):
+def get_text(i, translator):
     '''
-    :param inp: input data to be translated
+    :param i: input data to be translated
+    :param translator: object
     '''
-    translator = Translator()
-    not_translated = []
-    translated = []
     new_dict = {}
-    for i in flatten:
-        if i['maintext'] is None:
-            not_translated.append(i)
-        else:
-            twoParas = ".".join(i['maintext'].split("\n")[0:2])
-            two_sentences = ".".join(twoParas.split(".")[0:2])
-            ttext = translator.translate(two_sentences).text
-            ttitle = translator.translate(i['title']).text
-            new_dict = i
-            new_dict['translated_text'] = ttext
-            new_dict['translated_title'] = ttitle
-            translated.append(new_dict)
-    trans, nottrans = get_description(not_translated)
-    res = trans + translated
-    return res,nottrans
+    twoParas = ".".join(i['maintext'].split("\n")[0:2])
+    two_sentences = ".".join(twoParas.split(".")[0:2])
+    ttext = translator.translate(two_sentences).text
+    ttitle = translator.translate(i['title']).text
+    new_dict = i
+    new_dict['translated_text'] = ttext
+    new_dict['translated_title'] = ttitle
+    return new_dict
 
 # %%
 df = pd.read_csv('/Users/akankshabhattacharyya/Documents/DukePeaceProject/CSV/rsn1info.csv')
@@ -150,8 +133,17 @@ hold = []
 hold = item + item1 + item2
 flatten = [i for sublist in hold for i in sublist]
 
-#%%
-result,nottrans = translate_data(flatten)
+not_translated = []
+translated = []
+for i in flatten:
+    translator = Translator()
+    if i['maintext'] is None:
+        if i['description'] is None:
+            not_translated.append(i)
+        else:
+            translated.append(get_description(i, translator))
+    else:
+        translated.append(get_text(i, translator))
 
 # %%
 x = [h for h in hold if len(h)>1]
@@ -162,4 +154,4 @@ twoParas = ".".join(result[7]['description'].split("\n")[0:2])
 two_sentences = ".".join(twoParas.split(".")[0:2])
 ttext = translator.translate(two_sentences).text
 ttext
-# %%
+
