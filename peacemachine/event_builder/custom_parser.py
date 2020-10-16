@@ -1990,7 +1990,7 @@ def krikrs_story(soup):
 #%%
 def vremecom_story(soup):
     """
-    Function to pull the information we want from Kosova-sot.info stories
+    Function to pull the information we want from Vreme.com stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
