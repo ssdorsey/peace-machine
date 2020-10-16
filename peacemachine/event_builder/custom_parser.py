@@ -72,7 +72,7 @@ def kohajonecom_story(soup):
 #%%
 def panoramacomal_story(soup):
     """
-    Function to pull the information we want from Panorama stories
+    Function to pull the information we want from Panorama.al stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
@@ -88,7 +88,7 @@ def panoramacomal_story(soup):
 #%%
 def gazetashqiptareal_story(soup):
     """
-    Function to pull the information we want from Gazetashqiptareal stories
+    Function to pull the information we want from Gazetashqiptare.al stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
@@ -118,7 +118,7 @@ def gazetashqiptareal_story(soup):
 #%%
 def gazetaditaal_story(soup):
     """
-    Function to pull the information we want from Gazetadita stories
+    Function to pull the information we want from Gazetadita.al stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
@@ -148,7 +148,7 @@ def gazetaditaal_story(soup):
 #%%
 def telegrafal_story(soup):
     """
-    Function to pull the information we want from Telegraf stories
+    Function to pull the information we want from Telegraf.al stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
