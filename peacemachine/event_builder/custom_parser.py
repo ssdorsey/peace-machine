@@ -146,7 +146,7 @@ def gazetaditaal_story(soup):
     return hold_dict
     
 #%%
-def telegraf_story(soup):
+def telegrafal_story(soup):
     """
     Function to pull the information we want from Telegraf stories
     :param soup: BeautifulSoup object, ready to parse
@@ -176,7 +176,7 @@ def telegraf_story(soup):
     return hold_dict
  
 #%%
-def beninwebtv_story(soup):
+def beninwebtvcom_story(soup):
     """
     Function to pull the information we want from Beninwebtv stories
     :param soup: BeautifulSoup object, ready to parse
@@ -205,7 +205,7 @@ def beninwebtv_story(soup):
     return hold_dict
 
 # %%  
-def newsacotonou_story(soup):
+def newsacotonoucom_story(soup):
     """
     Function to pull the information we want from News.Acotonou stories
     :param soup: BeautifulSoup object, ready to parse
@@ -925,7 +925,7 @@ def lematinma_story(soup):
 #%%
 def almaghribiama_story(soup):
     """
-    Function to pull the information we want from Lematin.ma stories
+    Function to pull the information we want from Almaghribia.ma stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
@@ -977,7 +977,7 @@ def marocpresscom_story(soup):
 #%%
 def alakhbarpressma_story(soup):
     """
-    Function to pull the information we want from Marocpress.com stories
+    Function to pull the information we want from Alakhbar.press.ma stories
     :param soup: BeautifulSoup object, ready to parse
     """
     hold_dict = {}
