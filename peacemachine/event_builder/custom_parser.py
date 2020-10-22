@@ -2514,27 +2514,14 @@ def lafmcomco_story(soup):
         article_title = None
     return hold_dict
 
-#%% 
-header = {
-        'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'	        
-        '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')	  
-}
-#%%
-url = 'https://www.theeastafrican.co.ke/business/2560-3114720-8nm6slz/index.html'
-response = requests.get(url, headers=header).text
-soup = BeautifulSoup(response)
-
-# %%  
-text= theeastafricancoke_story(soup)
-text
-#%%
-def getUrlforDomain(domain):
-    count = db.articles.count_documents(
-        {
-            'source_domain': domain,
-        }
-    )
-    return count
-
-count = getUrlforDomain("lafm.com.co")
-print(count)
+def main():
+    
+    header = {
+            'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'	        
+            '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')	  
+    }
+    # url = 'https://www.theeastafrican.co.ke/business/2560-3114720-8nm6slz/index.html'
+    # response = requests.get(url, headers=header).text
+    # soup = BeautifulSoup(response)
+    # text= theeastafricancoke_story(soup)
+    # print(text)
