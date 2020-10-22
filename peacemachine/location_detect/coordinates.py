@@ -1,17 +1,17 @@
-
 #%%
 from pymongo import MongoClient
 import sys
 import pandas as pd
 from itertools import groupby
 from datetime import datetime
-# sys.path.append('mordecai-env/lib/python3.7/site-packages')
 from mordecai import Geoparser
+import spacy
+nlp = spacy.load("en_core_web_sm")
 
 db = MongoClient('mongodb://akankshanb:HavanKarenge123@vpn.ssdorsey.com:27017/ml4p').ml4p
 #%%
 geo = Geoparser()
-
+#%%
 def get_event_data(dt, source):
     '''
     :param dt - datetime
@@ -50,8 +50,12 @@ def get_locs(location, key):
     return hold_loc_dic
 #%%
 def parse_location(text):
+    '''
+    :param text: string containing news title
+    '''
     max_occ = -1
     locations = {}
+    top_loc = []
     try:
         loc = geo.geoparse(t)
         for l in loc:
@@ -62,10 +66,24 @@ def parse_location(text):
             location_list = list(group)
             if len(location_list)>0 and len(location_list) >= max_occ:
                 max_occ = len(location_list)
-                locations = get_locs(location_list[0], key)
+                top_loc = location_list
+        if len(top_loc) > 0:
+            locations = get_locs(top_loc[0], key)
         return locations
     except ValueError:
         loc = None
+#%%     
+def get_entity(text):
+    '''
+    :param text: string containing news title
+    '''
+    doc = nlp(text)
+    loc_entities = []
+    for X in doc.ents:
+        if X.label_=="GPE":
+            loc_entities += [X.text]
+    return loc_entities
+    
 #%%
 dt = datetime(2019,1,1)
 source = 'reuters.com'
@@ -79,22 +97,15 @@ for t in text:
     hold_loc+= [parse_location(t)]
 df1['location'] = hold_loc
 
-# %%
-df1[['title','location']]
 #%%
 df_left = df1[['title','location']][df1['location']=={}]
 # %%
+hold_loc = []
 for rowIndex in df_left.index:
+    hold_loc_dict = {}
     rowIndex = int(rowIndex)
     text = df_left.loc[rowIndex, 'title']
-    loc = geo.infer_country(text)
-    print(loc)
-#%%
-text = df_left.loc[1, 'title']
-print(text)
-#%%
-import spacy
-nlp = spacy.load("en_core_web_sm")
-#%%
-print(nlp("Peel's stop gives Oklahoma State Liberty Bowl"))
-# %%
+    loc_entities = get_entity(text)
+    for l in loc_entities:
+        hold_loc_dict[l] = []
+    df1.at[rowIndex, "location"] = hold_loc_dict
