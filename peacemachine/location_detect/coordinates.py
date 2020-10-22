@@ -1,4 +1,4 @@
-#%%
+
 from pymongo import MongoClient
 import sys
 import pandas as pd
@@ -9,9 +9,9 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 db = MongoClient('mongodb://akankshanb:HavanKarenge123@vpn.ssdorsey.com:27017/ml4p').ml4p
-#%%
+
 geo = Geoparser()
-#%%
+
 def get_event_data(dt, source):
     '''
     :param dt - datetime
@@ -24,7 +24,7 @@ def get_event_data(dt, source):
         }
     )]
     return d
-#%%
+
 def get_locs(location, key):
     '''
     :param location: geo dict from geoparser
@@ -48,7 +48,7 @@ def get_locs(location, key):
                 hold_loc_dic[geoVal] = []
                 hold_loc_dic[geoVal].append(key)
     return hold_loc_dic
-#%%
+
 def parse_location(text):
     '''
     :param text: string containing news title
@@ -72,7 +72,7 @@ def parse_location(text):
         return locations
     except ValueError:
         loc = None
-#%%     
+
 def get_entity(text):
     '''
     :param text: string containing news title
@@ -84,22 +84,20 @@ def get_entity(text):
             loc_entities += [X.text]
     return loc_entities
     
-#%%
 dt = datetime(2019,1,1)
 source = 'reuters.com'
 dd = get_event_data(dt, source)
 df = pd.DataFrame([i for i in dd])
 df1 = df.dropna(subset=['title'])
-df1 = df1[0:40]
+# df1 = df1[0:40]
 text = df1['title']
 hold_loc = []
 for t in text:
     hold_loc+= [parse_location(t)]
 df1['location'] = hold_loc
 
-#%%
-df_left = df1[['title','location']][df1['location']=={}]
-# %%
+##leftover whatever could not be found by mordecai, using NER Spacy
+df_left = df1[['title','location']][df1['location']=={}] 
 hold_loc = []
 for rowIndex in df_left.index:
     hold_loc_dict = {}
