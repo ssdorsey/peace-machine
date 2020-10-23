@@ -3,7 +3,7 @@ from pymongo import MongoClient
 import sys
 import pandas as pd
 from itertools import groupby
-from datetime import datetime
+from datetime import datetime,timedelta
 # sys.path.append('../../mordecai-env/lib/python3.7/site-packages')
 from mordecai import Geoparser
 import spacy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
@@ -16,6 +16,7 @@ geo = Geoparser()
 def get_event_data(dt, source):
     '''
     :param dt - datetime
+    :param source - source name
     '''
     col_name = f'{dt.year}-{dt.month}-events'
     d = [i for i in db[col_name].find(
@@ -28,8 +29,9 @@ def get_event_data(dt, source):
 
 def get_locs(location, key):
     '''
-    :param location: geo dict from geoparser
-    :param key: location name from text
+    returns dict of location
+    :param location: geoparser output
+    :param key: location grabbed from text
     '''
     hold_loc_dic = dict()
     # print(location)
@@ -60,7 +62,7 @@ def get_locs(location, key):
 
 def get_max_occ(grouped):
     '''
-    find max occurence of word
+    returns max occurence of location word in text
     :param grouped: grouped data
     '''
     maximum = -1
@@ -68,10 +70,11 @@ def get_max_occ(grouped):
         maximum = max(maximum, len(list(group))) 
     return maximum
 
-def get_locations(grouped, max_occ):
+def get_all_locations(grouped, max_occ):
     '''
-    get all locations possible
+    returns dict of final locations
     :param grouped: grouped data
+    :param max_occ: freq of each word
     '''
     locations = dict()
     for key,group in grouped:
@@ -84,7 +87,8 @@ def get_locations(grouped, max_occ):
 
 def parse_location(text):
     '''
-    :param text: string containing news title
+    returns final locations from text
+    :param text: string
     '''
     locations = {}
     try:
@@ -95,20 +99,21 @@ def parse_location(text):
         grouped = groupby(loc, key=lambda x:x['word'])
         max_occ = get_max_occ(grouped)
         grouped = groupby(loc, key=lambda x:x['word'])
-        locations = get_locations(grouped, max_occ)
+        locations = get_all_locations(grouped, max_occ)
         return locations
     except ValueError:
         loc = None
 
 def get_entity(text):
     '''
+    return dict of location entities
     :param text: string containing news title
     '''
     doc = nlp(text)
-    loc_entities = []
+    loc_entities = dict()
     for X in doc.ents:
         if X.label_=="GPE":
-            loc_entities += [X.text]
+            loc_entities[X.text] = []
     return loc_entities
     
 dt = datetime(2019,1,1)
@@ -116,7 +121,7 @@ source = 'nytimes.com'
 dd = get_event_data(dt, source)
 df = pd.DataFrame([i for i in dd])
 df1 = df.dropna(subset=['title'])
-df1 = df1[50:100]
+df1 = df1[50:100]       
 text = df1['title']
 hold_loc = []
 for t in text:
@@ -131,11 +136,4 @@ for rowIndex in df_left.index:
     rowIndex = int(rowIndex)
     text = df_left.loc[rowIndex, 'title']
     loc_entities = get_entity(text)
-    for l in loc_entities:
-        hold_loc_dict[l] = []
     df1.at[rowIndex, "location"] = hold_loc_dict
-# %%
-
-get_entity('Macron Vows Order ‘Without Compromise’ in Rebuke to Yellow Vest Protests')
-
-# %%
