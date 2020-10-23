@@ -121,7 +121,7 @@ source = 'nytimes.com'
 dd = get_event_data(dt, source)
 df = pd.DataFrame([i for i in dd])
 df1 = df.dropna(subset=['title'])
-df1 = df1[50:100]       
+# df1 = df1[50:100]       
 text = df1['title']
 hold_loc = []
 for t in text:
