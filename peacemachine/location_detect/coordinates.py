@@ -4,17 +4,18 @@ import sys
 import pandas as pd
 from itertools import groupby
 from datetime import datetime,timedelta
-sys.path.append('../../mordecai-env/lib/python3.7/site-packages')
+# sys.path.append('../../mordecai-env/lib/python3.7/site-packages')
 from mordecai import Geoparser
 import spacy  
 import json  
-import pprint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+import wptools                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 
 class Location():
     def __init__(self, *args):
         self.geo = Geoparser()
         self.demonymMapping = self.initialize_mapping()
         self.nlp = spacy.load("en_core_web_sm")
+        self.wikimodel = spacy.load("xx_ent_wiki_sm")
     
     def initialize_mapping(self):
         '''
@@ -124,6 +125,20 @@ class Location():
                     loc_entities[X.text] = []
         return loc_entities
     
+    def wiki_search(self, text):
+        '''
+        search for names on wiki
+        :param text: String containing name
+        '''
+        try:
+            info = wptools.page(text).get_parse()
+            place = info.data['infobox']['birth_place']
+            return self.split_and_get_loc(place)
+        except:
+            return {}
+        
+        
+    
     def get_entity(self,text):
         '''
         return dict of location entities
@@ -135,13 +150,14 @@ class Location():
             if X.label_=="GPE":
                 loc_entities[X.text] = []
             elif X.label_=="PERSON":
-                pass
+                loc_entities.update(self.wiki_search(X.text))
             elif X.label_=="ORG":
                 loc_entities.update(self.split_and_get_loc(X.text))
                 pass
             elif X.label_=="NORP":
                 loc_entities[self.get_demonym(X.text)] = []
         return loc_entities      
+    
 
 def get_event_data(dt, source,db):
     '''
@@ -157,19 +173,20 @@ def get_event_data(dt, source,db):
     )]
     return d  
 
+    
 def main():
     db = MongoClient('mongodb://akankshanb:HavanKarenge123@vpn.ssdorsey.com:27017/ml4p').ml4p
     dt = datetime(2019,1,1)
-    source = 'nytimes.com'
+    source = 'bbc.com'
     dd = get_event_data(dt, source,db)
     df = pd.DataFrame([i for i in dd])
     df.dropna(subset=['title'])
     print("------data collected-----")
-    df1 = df[0:50]       
+    # df1 = df[0:50]       
     text = df1['title']
     hold_loc = []
-    # text = ['abcd']
     location = Location()
+    # print(location.wiki_search('1919: The Year of the Crack-Up'))
     hold_loc = []
     print("-------extracting locations------")
     for t in text:
@@ -179,7 +196,7 @@ def main():
             hold_loc+= [location.get_entity(t)]
         else:
             hold_loc += [{}]
-        print(t, "location dict", hold_loc[-1])
+        # print(t, "location dict", hold_loc[-1])
     # print(len(hold_loc), df1.shape)
     df1['location'] = hold_loc
     

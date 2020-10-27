@@ -90,7 +90,7 @@
 1. Run opennmt-py_transformers_train.sh (probably should be done on the cloud. need ~16gb VRAM, 8GPU helps with speed)
 
 ##Location
-1. Go inside peacedirectory using ```cd ~/peace-machine/peacemachine/```
+1. Go inside peacedirectory using ```cd ~/peace-machine/```
 2. Create virtual env using:
     ``` 
     python3 -m venv <ENV_NAME>
@@ -102,7 +102,7 @@
     ```
 3. Install required spacy model
     ```
-    python -m spacy download en_core_web_lg
+    python3 -m spacy download en_core_web_lg
     ```
 4. To install Geonames gazetteer running on elastic search, install by running the following commands (you must have [Docker](https://docs.docker.com/engine/installation/)
 installed first).
@@ -112,9 +112,14 @@ installed first).
     tar -xzf geonames_index.tar.gz
     docker run -d -p 127.0.0.1:9200:9200 -v $(pwd)/geonames_index/:/usr/share/elasticsearch/data elasticsearch:5.5.2
     ```
-5. Inside peace-machine directory, add environment path to $PYTHONPATH using
+5. Install wptools
+    ```
+    pip install wptools
+    ```
+6. Inside peace-machine directory, add environment path to $PYTHONPATH using
     ```
     export PYTHONPATH="$PWD/<ENV_NAME>/lib/python3.7/site-packages"
     ```
-6. Change directory: ```cd ocation_detect/```
-7. Run ```python3 coordinates.py```
+    Be sure to check the $PYTHONPATH points correctly to the environement everytime. 
+7. Change directory: ```cd location_detect/```
+8. Run ```python3 coordinates.py```
