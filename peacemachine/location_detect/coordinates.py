@@ -137,8 +137,6 @@ class Location():
         except:
             return {}
         
-        
-    
     def get_entity(self,text):
         '''
         return dict of location entities
