@@ -1356,7 +1356,7 @@ def adndigitalcompy_story(soup):
     return hold_dict
 
 #%%
-def diascompy_story(soup):
+def _5diascompy_story(soup):
     """
     Function to pull the information we want from 5dias.com.py stories
     :param soup: BeautifulSoup object, ready to parse
