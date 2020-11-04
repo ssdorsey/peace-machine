@@ -2514,14 +2514,29 @@ def lafmcomco_story(soup):
         article_title = None
     return hold_dict
 
+def vanguardngrcom_story(soup):
+    """
+    Function to pull the information we want from Vanguardngr.com stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class": "entry-date published"})
+        date = article_date['datetime']
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+    return hold_dict
+
 def main():
     
     header = {
             'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'	        
             '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')	  
     }
-    # url = 'https://www.theeastafrican.co.ke/business/2560-3114720-8nm6slz/index.html'
+    # url = 'https://www.vanguardngr.com/2020/11/enugu-community-senator-utazi-hosts-ugwuanyi/'
     # response = requests.get(url, headers=header).text
     # soup = BeautifulSoup(response)
-    # text= theeastafricancoke_story(soup)
+    # text= vanguardngrcom_story(soup)
     # print(text)
