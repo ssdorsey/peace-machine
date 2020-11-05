@@ -645,11 +645,11 @@ def eltiempocom_story(soup):
         maintext = [para.text for para in soup.find_all('p', attrs={"class": "contenido"})]
         hold_dict['maintext'] = '\n '.join(maintext)
     except:
-        article_body = None
+        maintext = None
     #date
     try:
         article_date = soup.find('span', attrs={"class": "fecha"})
-        date = article_date.text
+        date = article_date.text.split(",")[0]
         hold_dict['date_publish'] = dateparser.parse(date)
     except:
         article_date = None
@@ -2535,8 +2535,7 @@ def main():
             'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36'	        
             '(KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')	  
     }
-    # url = 'https://www.vanguardngr.com/2020/11/enugu-community-senator-utazi-hosts-ugwuanyi/'
+    # url = 'https://www.eltiempo.com/colombia/santander/rodolfo-hernandez-revela-su-estrategia-para-las-presidenciales-2022-547072'
     # response = requests.get(url, headers=header).text
     # soup = BeautifulSoup(response)
-    # text= vanguardngrcom_story(soup)
-    # print(text)
+    # text= eltiempocom_story(soup)
