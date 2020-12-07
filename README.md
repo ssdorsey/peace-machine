@@ -89,7 +89,7 @@
 1. Run opennmt-py_transformers_preprocess.sh
 1. Run opennmt-py_transformers_train.sh (probably should be done on the cloud. need ~16gb VRAM, 8GPU helps with speed)
 
-##Location
+## Location
 1. Go inside peacedirectory using ```cd ~/peace-machine/```
 2. Create virtual env using:
     ``` 
