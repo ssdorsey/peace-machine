@@ -100,9 +100,10 @@
     ```
     pip install mordecai
     ```
-3. Install required spacy model
+3. Install required spacy models
     ```
     python3 -m spacy download en_core_web_lg
+    python3 -m spacy download xx_ent_wiki_sm
     ```
 4. To install Geonames gazetteer running on elastic search, install by running the following commands (you must have [Docker](https://docs.docker.com/engine/installation/)
 installed first).
