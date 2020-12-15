@@ -90,6 +90,14 @@
 1. Run opennmt-py_transformers_train.sh (probably should be done on the cloud. need ~16gb VRAM, 8GPU helps with speed)
 
 ## Location
+
+### Prerequisites:
+1. pymongo
+2. pandas
+3. tqdm
+4. spacy
+
+### Installation
 1. Go inside peacedirectory using ```cd ~/peace-machine/```
 2. Create virtual env using:
     ``` 
