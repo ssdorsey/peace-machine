@@ -96,6 +96,7 @@
 2. pandas
 3. tqdm
 4. spacy
+5. tensorflow>=2.2.0
 
 ### Installation
 1. Go inside peacedirectory using ```cd ~/peace-machine/```
