@@ -813,7 +813,43 @@ def malijetcom_story(soup):
     except:
         article_title = None
     return hold_dict
-    
+   
+#%%
+def maliwebnet_story(soup):
+    """
+    Function to pull the information we want from Maliweb.net stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #date
+    try:
+        article_date = soup.find('time', attrs={"class":"entry-date updated td-module-date"})
+        date = article_date['datetime']
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+        # hold_dict['date_publish'] = None
+    return hold_dict
+ 
+#%%
+def lessorsite_story(soup):
+    """
+    Function to pull the information we want from Lessor.site stories
+    :param soup: BeautifulSoup object, ready to parse
+    """
+    hold_dict = {}
+    #date
+    try:
+        article_date = soup.find('div', attrs={"class":"main col-md-8"})
+        article_date = article_date.find('div', attrs={"class":"post-date"})
+        date = article_date.text
+        # print(date)
+        hold_dict['date_publish'] = dateparser.parse(date)
+    except:
+        article_date = None
+        hold_dict['date_publish'] = None
+    return hold_dict
+
 #%%
 def lecalameinfo_story(soup):
     """
