@@ -1,0 +1,142 @@
+import os
+import re
+import pandas as pd
+from tqdm import tqdm
+from p_tqdm import p_umap
+import time
+
+from pymongo import MongoClient
+
+db = MongoClient('mongodb://ml4pAdmin:ml4peace@192.168.176.240').ml4p
+
+# time.sleep((60*60)*4)
+
+countries = ['PRY', 'ECU', 'COL']
+
+ints = [doc['source_domain'] for doc in db['sources'].find({'major_international': True, 'include': True})]
+loc = [doc['source_domain'] for doc in db['sources'].find(
+    {
+        'primary_location': {'$in': ['PRY', 'ECU', 'COL']},
+        'include': True
+    }
+)]
+domains = ints+loc
+
+events = [k for k in db.models.find_one({'model_name': 'RAI'}).get('event_type_nums').keys()] + ['-999']
+
+legal_re = re.compile(r'(freedom.*|assembl.*|associat.*|term limit.*|independen.*|succession.*|demonstrat.*|crackdown.*|draconian|censor.*|authoritarian|repress.*|NGO|human rights)')
+
+russia = pd.read_excel(r"D:\Dropbox\peace-machine\peacemachine\data\actors\Acronyms_Russia.xlsx")
+# russia_re = '(' + '|'.join(russia['CompanyName']) + ')'
+
+china = pd.read_excel(r"D:\Dropbox\peace-machine\peacemachine\data\actors\Acronyms_China.xlsx")
+china['CompanyName'] = china['CompanyName'].str.strip()
+# china_re = '(' + '|'.join(china['CompanyName']) + ')'
+
+rai_re = '(' + '|'.join(pd.concat([russia['CompanyName'], china['CompanyName']])) + ')'
+
+
+def check_legal(doc):
+    try:
+        if bool(legal_re.search(doc.get('title'))) or bool(legal_re.search(doc.get('maintext'))):
+            return True
+        else:
+            return False
+    except:
+        return False
+
+
+country_re = re.compile(r'(Ecuador.*|Colombia.*|Paraguay)')
+
+df = pd.DataFrame()
+df['date'] = pd.date_range('2000-1-1', '2020-12-1', freq='M')
+df.index = df['date']
+df['year'] = [dd.year for dd in df.index]
+df['month'] = [dd.month for dd in df.index]
+
+for et in events:
+    df[et] = [0] * len(df)
+
+
+# START WITH THE LOCALS
+def count_domain_loc(domain):
+
+    db2 = MongoClient('mongodb://ml4pAdmin:ml4peace@192.168.176.240').ml4p
+
+    # create a new frame to work with
+    dom_df = df.copy(deep=True)
+
+    for date in dom_df.index:
+        colname = f'articles-{date.year}-{date.month}'
+
+        cur = db2[colname].find(
+            {
+                'source_domain': domain,
+                'include': True,
+                'RAI': {'$exists': True}, 
+                '$or': [
+                    {'title': {'$regex': rai_re}},
+                    {'maintext': {'$regex': rai_re}}
+                ]
+            }
+        )
+        docs = [doc for doc in cur]
+
+        for et in events:
+            # TODO: APPLY THE LEGALCHANGE FILTER!![dd.year for dd in df['date']]
+
+            count = len([doc for doc in docs if doc['RAI']['event_type'] == et])
+
+            dom_df.loc[date, et] = count
+
+    dom_df.to_csv(f'D:Dropbox/ML for Peace/Counts_RAI/2020_11_23/{domain}.csv')
+
+
+
+# Then ints
+def count_domain_int(domain):
+
+    db2 = MongoClient('mongodb://ml4pAdmin:ml4peace@192.168.176.240').ml4p
+
+    # create a new frame to work with
+    dom_df = df.copy(deep=True)
+
+    for date in dom_df.index:
+        colname = f'articles-{date.year}-{date.month}'
+
+        cur = db2[colname].find(
+            {
+                'source_domain': domain,
+                'include': True,
+                'year': date.year,
+                'month': date.month,
+                'RAI': {'$exists': True},
+                '$and': [
+                    {'$or': [
+                        {'title': {'$regex': 'Paraguay'}},
+                        {'maintext': {'$regex': 'Paraguay'}}
+                    ]},
+                   { '$or': [
+                        {'title': {'$regex': rai_re}},
+                        {'maintext': {'$regex': rai_re}}
+                    ]}
+                ]                
+            }
+        )
+        docs = [doc for doc in cur]
+
+        for et in events:
+            # TODO: APPLY THE LEGALCHANGE FILTER!![dd.year for dd in df['date']]
+
+            count = len([doc for doc in docs if doc['RAI']['event_type'] == et])
+
+            dom_df.loc[date, et] = count
+
+    dom_df.to_csv(f'D:Dropbox/ML for Peace/Counts_RAI/2020_11_23/{domain}_paraguay.csv')
+
+if __name__ == "__main__":
+    
+    p_umap(count_domain_loc, loc, num_cpus=8)
+    p_umap(count_domain_int, ints, num_cpus=8)
+
+

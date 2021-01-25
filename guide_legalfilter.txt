@@ -1,0 +1,23 @@
+From reading training data and incorporating above:
+
+
+
+Types: freedom, assembly, association, movement term limits, independent/independence, press, succession, demonstrate/demonstration,
+
+
+
+
+
+Style (i.e. words used to describe the changes): arbitrary, repression/repressive, crackdown, draconian, intimidate, censoring, controversial, muzzle, censor, restrictive, authoritarian, stifling, ban, strict
+
+
+
+Response: opposition, protests, dissent, demonstrations/demonstrators, boycott
+
+
+
+Recipient/target: non-governmental organizations, NGOs, media, press, parties, civil society, critics, opponents/opposition, human rights groups
+
+
+
+(freedom.*|assembl.*|associat.*|term limit.*|independen.*|succession.*|press.*|demonstrat.*|crackdown.*|draconian|censor.*|authoritarian|repress.*|NGO|human rights)

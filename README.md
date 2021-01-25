@@ -1,11 +1,18 @@
 # peace-machine
 
-# Setting up the Pipeline
+## Setting up the PC (Instructions below assume Ubuntu 18)
+1. Install [Anaconda distribution of python 3.8](https://www.anaconda.com/products/individual)
+2. Install [awscli](https://linuxhint.com/install_aws_cli_ubuntu/)
+3. Install [gcc](https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/)
+4. Install [ruby](https://www.ruby-lang.org/en/documentation/installation/#apt)
+5. Install wayback-machine-downloader: ```gem install wayback_machine_downloader```
 
-## Install the required packages
+## Setting up the Pipeline
+
+### Install the required packages
 1. Install peace-machine from github: ```pip install -U git+https://github.com/ssdorsey/peace-machine.git```
 
-## Setup the Mongo Database
+### Setup the Mongo Database
 
 1. Download + Install [MongoDB Server](https://www.mongodb.com/download-center/community)
 1. (Optional) Set local database base in mongod.conf file

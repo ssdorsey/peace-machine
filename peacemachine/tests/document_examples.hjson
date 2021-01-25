@@ -1,0 +1,109 @@
+// --------------------------------------
+// Article
+// --------------------------------------
+
+{
+	"title": "Blah",
+	"maintext": "Blah",
+	"title_original_language": "Bláh",
+	"maintext_original_language": "Bláh",
+	"use_in_counts": true, 
+	"needs_translating": false
+}
+
+// --------------------------------------
+// Sources
+// --------------------------------------
+
+{
+	"full_domain": "https://www.nytimes.com", // domain name with protocol
+	"source_domain": "nytimes.com", // domain name without protocol 
+	"primary_language": "en", // iso 2 
+	"primary_location": "USA", // ISO 3
+	"major_international": true,
+	"whitelist_url_patterns": ["/world/", "/politics/", "/us/"], // process only articles with these patterns in their url. If empty, use all urls from this domain
+	"blacklist_url_patterns": ["/style/"], // do not scrape (or delete) articles with these patterns in their url
+	"whitelist_html_patterns": [], // only process articles with these patterns in their html
+	"blacklist_html_patterns": [], // do not scrape (or delete) articles with these patterns in their html
+	"custom_parser": "", // give the name for the custom parser function to be found in custom_parsers.py, if empty use default newsplease
+	"historical_sitemap": true, // boolean for whether the site provides a historical sitemap for scraping old articles
+	"include": true, // boolean for whether or not this domain should be scraped / analyzed
+	"start_usable_date": '2000-01-01' // start date for usable stories
+}
+
+
+// --------------------------------------
+// Languages
+// --------------------------------------
+
+{
+	"iso_name": "Spanish", // ISO language name
+	"iso_code": "es", // ISO 639-1 code
+	"model_type": "huggingface", // The type of translation model to use for this language, so far only huggingface and OpenNMT models are supported
+	"huggingface_name": "'Helsinki-NLP/opus-mt-ROMANCE-en'", // name for huggingface models
+	"model_location": "" // location for custom models
+}
+
+
+
+// --------------------------------------
+// Models
+// --------------------------------------
+
+{
+	"model_name": "civic1.0",
+	"model_location": "PATH",
+	"event_type_nums":{
+		"violencelethal": 0,
+		"violencelethal": 1
+	},
+	"event_type_cutoffs": {
+		"violencelethal": 0.7,
+		"violencenonlethal": 0.9
+	},
+	"event_type_keyword_whitelist":{
+		"violencelethal": [
+			"die*",
+			"dead",
+			"kill*",
+			"murder*",
+		]
+	},
+	"event_type_keyword_blacklist":{
+		"violencelethal": [
+			"football"
+		]
+	}
+
+}
+
+// --------------------------------------
+// Training data
+// --------------------------------------
+
+{}
+
+// --------------------------------------
+// Archives
+// --------------------------------------
+
+// gdelt
+{
+	"url": "https://gdelt...",
+	"included_domains": [
+		"nytimes.com",
+
+	]
+}
+
+
+// ccnews
+{
+	"url": "crawldata/...",
+	"included_domains": [
+		"nytimes.com",
+		
+	]
+}
+
+

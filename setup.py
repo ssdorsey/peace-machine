@@ -1,37 +1,24 @@
-from setuptools import find_packages, setup
-
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+from setuptools import setup, find_packages
 
 setup(
-    name="wanderingpole",
-    version="0.1",
-    author="Spencer Dorsey",
-    author_email="spencer.dorsey@duke.edu",
-    description="A project for tracking polarization in elite political messaging",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/ssdorsey/peace-machine",
+    name="peace-machine",
+    version='0.1',
+    # py_modules=['hello'],
     packages=find_packages(),
-    classifiers=[
-          "Intended Audience :: Science/Research",
-          "License :: OSI Approved :: MIT License",
-          "Programming Language :: Python :: 3",
-          "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    ],
-    python_requires=">=3.6",
     install_requires=[
-        "selenium",
-        "pandas", 
-        "pandas",
-        "numpy",
-        "requests",
-        "tqdm",
-        "regex",
-        "transformers",
-        "simpletransformers",
-        "scipy",
-        "scikit-learn",
-        "seqeval",
+        'Click',
+        'transformers',
+        'p_tqdm',
+        'allennlp',
+        'allennlp-models',
+        'pandas',
+        'cchardet'
+
+        # 'Scrapy>=1.1.0',
+        # Add all the required packages here
     ],
+    
+    entry_points={
+         'console_scripts': ['peace-machine = peacemachine.commands:cli'] # Add more commands here
+    },
 )

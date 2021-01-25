@@ -1,0 +1,9 @@
+# list all my requirements here
+# pytorch
+# pandas
+# transformers
+# pymongo
+# p_tqdm
+# beautifulsoup4
+
+# whatever version on news-please
