@@ -89,7 +89,16 @@
 1. Run opennmt-py_transformers_preprocess.sh
 1. Run opennmt-py_transformers_train.sh (probably should be done on the cloud. need ~16gb VRAM, 8GPU helps with speed)
 
-##Location
+## Location
+
+### Prerequisites:
+1. pymongo
+2. pandas
+3. tqdm
+4. spacy
+5. tensorflow>=2.2.0
+
+### Installation
 1. Go inside peacedirectory using ```cd ~/peace-machine/```
 2. Create virtual env using:
     ``` 
@@ -100,9 +109,10 @@
     ```
     pip install mordecai
     ```
-3. Install required spacy model
+3. Install required spacy models
     ```
     python3 -m spacy download en_core_web_lg
+    python3 -m spacy download xx_ent_wiki_sm
     ```
 4. To install Geonames gazetteer running on elastic search, install by running the following commands (you must have [Docker](https://docs.docker.com/engine/installation/)
 installed first).
