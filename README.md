@@ -66,7 +66,7 @@
 ## Run De-Deuplication and Patch Scrpit
 1. Open terminal and got to peace-machine/peacemachine/scripts
 2. Run the patch file: ``` python3 patch_tools.py```
-### Note: Make sure you run this script before running the locatrion, translation and event extractor pipeline
+Note: Make sure you run this script before running the locatrion, translation and event extractor pipeline
 
 ## Run the Event Extraction
 1. Open a new terminal
