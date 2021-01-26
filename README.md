@@ -6,6 +6,7 @@
 3. Install [gcc](https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/)
 4. Install [ruby](https://www.ruby-lang.org/en/documentation/installation/#apt)
 5. Install wayback-machine-downloader: ```gem install wayback_machine_downloader```
+6. Install NVIDIA GPU drivers(depending on the machine)
 
 ## Setting up the Pipeline
 
@@ -65,7 +66,7 @@
 
 ## Run De-Deuplication and Patch Scrpit
 1. Open terminal and got to peace-machine/peacemachine/scripts
-2. Run the patch file: ``` python3 patch_tools.py```
+2. Run the patch file: ``` python3 patch_tools.py``` <br>
 Note: Make sure you run this script before running the locatrion, translation and event extractor pipeline
 
 ## Run the Event Extraction
