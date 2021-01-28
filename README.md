@@ -64,7 +64,7 @@
     * This will track the .warc files you have already downloaded/parsed. If you add a new domain (and thus need to rerun the files), set ```my_continue_process = False``` in commoncrawl.py
 5. Rerun commoncrawl.py whenever you want to collect new data
 
-## Run De-Deuplication and Patch Scrpit
+## Run De-Deuplication and Patch Script
 1. Open terminal and got to peace-machine/peacemachine/scripts
 2. Run the patch file: ``` python3 patch_tools.py``` <br>
 Note: Make sure you run this script before running the locatrion, translation and event extractor pipeline
