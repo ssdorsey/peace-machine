@@ -69,17 +69,17 @@
 2. Run the patch file: ``` python3 patch_tools.py``` <br>
 Note: Make sure you run this script before running the locatrion, translation and event extractor pipeline
 
-## Run the Event Extraction
-1. Open a new terminal
-2. Run the extractor: ```peace-machine -u [MongoDB URI] -e [MODEL NAME] -b [BATCH SIZE] -ml [LOCATION OF MODEL ON DRIVE]```
-    * EX: ```peace-machine -u mongodb://username:password@192.168.176.240 -e civic1 -b 768 -ml "/mnt/d/peace-machine/peacemachine/data/finetuned-transformers"```
-
 ## Run translation
 1. Open a new terminal
 2. Run: ```peace-machine -t [ISO2 LANGUAGE CODE]```
     * Ex: ```peace-machine -t es```
     * Other options (such as batch sizing) are available using ```peace-machine --help```
     * Iso2 language code must be in the languages collection of the DB
+
+## Run the Event Extraction
+1. Open a new terminal
+2. Run the extractor: ```peace-machine -u [MongoDB URI] -e [MODEL NAME] -b [BATCH SIZE] -ml [LOCATION OF MODEL ON DRIVE]```
+    * EX: ```peace-machine -u mongodb://username:password@192.168.176.240 -e civic1 -b 768 -ml "/mnt/d/peace-machine/peacemachine/data/finetuned-transformers"```
 
 
 ## Automate
