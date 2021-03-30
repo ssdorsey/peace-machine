@@ -1,12 +1,13 @@
 # peace-machine
 
 ## Setting up the PC (Instructions below assume Ubuntu 18)
-1. Install [Anaconda distribution of python 3.8](https://www.anaconda.com/products/individual)
+1. Install [Anaconda distribution of python 3.8](https://www.anaconda.com/products/individual). For remote installation use: https://kengchichang.com/post/conda-linux/
 2. Install [awscli](https://linuxhint.com/install_aws_cli_ubuntu/)
 3. Install [gcc](https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/)
 4. Install [ruby](https://www.ruby-lang.org/en/documentation/installation/#apt)
-5. Install wayback-machine-downloader: ```gem install wayback_machine_downloader```
-6. Install NVIDIA GPU drivers(depending on the machine)
+5. Create conda environment: ```conda create -n peace python=3.8``` and then ```conda activate peace```
+6. Install wayback-machine-downloader: ```sudo gem install wayback_machine_downloader```
+7. Install NVIDIA GPU drivers(depending on the machine)
 
 ## Setting up the Pipeline
 
