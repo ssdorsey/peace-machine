@@ -244,9 +244,6 @@ def main(uri, num_cpus=1):
                                                continue_process=True)
 
 if __name__ == "__main__":
-    if getpass.getuser() in ['Batan', 'spenc']: #TODO convert this over to a command-line read
-        _uri = 'mongodb://ml4pAdmin:ml4peace@192.168.176.240'
-    else:
-        _uri = 'mongodb://ml4pAdmin:ml4peace@vpn.ssdorsey.com'
+    _uri = '' # TODO: ENTER URI HERE
     db = MongoClient(_uri, maxPoolSize=1000).ml4p
     main(uri=_uri, num_cpus=10)
